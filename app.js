@@ -121,7 +121,7 @@ function bindProductEvents() {
 
 function render() {
   productList.innerHTML = state.products.map(renderProduct).join("") + `
-    <div class="add-hint"><span class="plus">＋</span><div><h3>欲しいものを追加する</h3><p>商品のリンクを送ってくれたら、価格や仕様を確認してここに追加します。</p></div></div>`;
+    <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・在庫を自動確認します。</p></div></a>`;
   renderSummary();
   bindProductEvents();
 }
