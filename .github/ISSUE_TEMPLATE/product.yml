@@ -1,0 +1,20 @@
+name: 商品リンクから追加
+description: 商品URLから商品名・価格・画像・在庫を自動確認します
+title: "[商品追加] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        商品ページのURLを貼って送信してください。確認結果はこのIssueへ自動で届きます。
+  - type: input
+    id: url
+    attributes:
+      label: 商品URL
+      placeholder: https://example.com/product
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: 希望やメモ
+      description: 色、容量、サイズなど、希望する構成があれば入力してください。
