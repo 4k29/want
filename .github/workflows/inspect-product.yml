@@ -1,0 +1,52 @@
+name: Inspect product link
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  inspect:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[商品追加]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inspect product page
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node scripts/inspect-product.mjs > product-result.json
+
+      - name: Post inspection result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const result = JSON.parse(fs.readFileSync('product-result.json', 'utf8'));
+            const safe = (value) => String(value ?? '')
+              .replaceAll('&', '&amp;')
+              .replaceAll('<', '&lt;')
+              .replaceAll('>', '&gt;');
+            const price = result.price
+              ? `${safe(result.priceCurrency || '')} ${safe(result.price)}`.trim()
+              : '取得できませんでした';
+            const lines = [
+              '## 自動確認結果',
+              '',
+              `- **商品名:** ${safe(result.name) || '取得できませんでした'}`,
+              `- **価格:** ${price}`,
+              `- **在庫:** ${safe(result.availability) || '不明'}`,
+              `- **URL:** ${safe(result.url)}`,
+              '',
+              result.image ? `![商品画像](${result.image})` : '',
+              '',
+              '> 自動取得した内容です。商品ページと照合してからリストへ反映してください。',
+            ].filter(Boolean);
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: lines.join('\n'),
+            });
