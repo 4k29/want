@@ -1,0 +1,61 @@
+{
+  "budget": 700000,
+  "lastChecked": "2026-08-05",
+  "products": [
+    {
+      "id": "iphone-air",
+      "category": "スマートフォン",
+      "name": "iPhone Air",
+      "configuration": "スカイブルー・SIMフリー",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-compare-iphone-air-202509?.v=M0dlUVBobHVpY1h1dmlaR3RZekpEMGtrRFZUNExaR0FUNGxJZXJuT2lqUjE5VXk1QVF5NWxrMFlTNWNpV2huNVM0TjRWdzF2UjRGVEY0c3dBQVZ6VGUza2N1YW5ubjVFaHZuNzNKcFIzTnc&fmt=png-alpha&hei=512&wid=400",
+      "imageAlt": "スカイブルーのiPhone Air",
+      "imageClass": "iphone-image",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": ["storage"],
+      "optionLabels": { "storage": "ストレージ" },
+      "variants": [
+        { "options": { "storage": "256GB" }, "price": 177800 },
+        { "options": { "storage": "512GB" }, "price": 212800 },
+        { "options": { "storage": "1TB" }, "price": 247800 }
+      ],
+      "details": [
+        { "label": "ディスプレイ", "value": "6.5インチ Super Retina XDR" },
+        { "label": "チップ", "value": "A19 Pro" },
+        { "label": "カメラ", "value": "48MP Fusionメイン" },
+        { "label": "重さ", "value": "165 g" }
+      ],
+      "note": "薄さと軽さを優先。256GBを第一候補として比較中。",
+      "url": "https://www.apple.com/jp/shop/buy-iphone/iphone-air"
+    },
+    {
+      "id": "ipad-pro-13",
+      "category": "タブレット",
+      "name": "13インチiPad Pro",
+      "configuration": "スペースブラック・Wi‑Fi",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-compare-header-pro-202405?.v=bk5Ha2llcUlIczRSRUt0WDVzK2I3aEpsdjhCN0cycWFLRklRalhsdmV1Y1k2Q3FubUg5cC93VlMzQkExanhMSzAzOVFHb3N0MkVmS01ZcFh0d1Y4R21yc3hpVFRmZnBDMzlsazg4c2M0Vk0&fmt=png-alpha&hei=398&wid=392",
+      "imageAlt": "スペースブラックのiPad Pro",
+      "imageClass": "ipad-image",
+      "selected": true,
+      "defaultVariant": 4,
+      "optionOrder": ["glass", "storage"],
+      "optionLabels": { "glass": "ディスプレイガラス", "storage": "ストレージ" },
+      "variants": [
+        { "options": { "glass": "標準", "storage": "256GB" }, "price": 269800 },
+        { "options": { "glass": "標準", "storage": "512GB" }, "price": 304800 },
+        { "options": { "glass": "標準", "storage": "1TB" }, "price": 374800 },
+        { "options": { "glass": "標準", "storage": "2TB" }, "price": 464800 },
+        { "options": { "glass": "Nano-texture", "storage": "1TB" }, "price": 391800 },
+        { "options": { "glass": "Nano-texture", "storage": "2TB" }, "price": 481800 }
+      ],
+      "details": [
+        { "label": "ディスプレイ", "value": "13インチ Ultra Retina XDR" },
+        { "label": "チップ", "value": "M5" },
+        { "label": "メモリ", "value": "12GB / 16GB（構成による）" },
+        { "label": "認証", "value": "Face ID" }
+      ],
+      "note": "写真編集用。13インチ、Nano-textureガラスを優先。",
+      "url": "https://www.apple.com/jp/shop/buy-ipad/ipad-pro"
+    }
+  ]
+}
