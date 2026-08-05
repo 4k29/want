@@ -4,20 +4,34 @@
   "products": [
     {
       "id": "iphone-air",
-      "category": "スマートフォン",
       "name": "iPhone Air",
-      "configuration": "スカイブルー・SIMフリー",
+      "configuration": "SIMフリー",
       "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-compare-iphone-air-202509?.v=M0dlUVBobHVpY1h1dmlaR3RZekpEMGtrRFZUNExaR0FUNGxJZXJuT2lqUjE5VXk1QVF5NWxrMFlTNWNpV2huNVM0TjRWdzF2UjRGVEY0c3dBQVZ6VGUza2N1YW5ubjVFaHZuNzNKcFIzTnc&fmt=png-alpha&hei=512&wid=400",
       "imageAlt": "スカイブルーのiPhone Air",
       "imageClass": "iphone-image",
       "selected": true,
       "defaultVariant": 0,
-      "optionOrder": ["storage"],
-      "optionLabels": { "storage": "ストレージ" },
+      "optionOrder": ["color", "storage"],
+      "optionLabels": { "color": "カラー", "storage": "ストレージ" },
+      "optionColors": {
+        "スカイブルー": "#dce8e8",
+        "ライトゴールド": "#eee7dc",
+        "クラウドホワイト": "#f3f3f0",
+        "スペースブラック": "#2f3030"
+      },
       "variants": [
-        { "options": { "storage": "256GB" }, "price": 177800 },
-        { "options": { "storage": "512GB" }, "price": 212800 },
-        { "options": { "storage": "1TB" }, "price": 247800 }
+        { "options": { "color": "スカイブルー", "storage": "256GB" }, "price": 159800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "スカイブルー", "storage": "512GB" }, "price": 194800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "スカイブルー", "storage": "1TB" }, "price": 229800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "ライトゴールド", "storage": "256GB" }, "price": 159800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "ライトゴールド", "storage": "512GB" }, "price": 194800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "ライトゴールド", "storage": "1TB" }, "price": 229800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "クラウドホワイト", "storage": "256GB" }, "price": 159800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "クラウドホワイト", "storage": "512GB" }, "price": 194800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "クラウドホワイト", "storage": "1TB" }, "price": 229800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "スペースブラック", "storage": "256GB" }, "price": 159800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "スペースブラック", "storage": "512GB" }, "price": 194800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" },
+        { "options": { "color": "スペースブラック", "storage": "1TB" }, "price": 229800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" }
       ],
       "details": [
         { "label": "ディスプレイ", "value": "6.5インチ Super Retina XDR" },
@@ -25,12 +39,10 @@
         { "label": "カメラ", "value": "48MP Fusionメイン" },
         { "label": "重さ", "value": "165 g" }
       ],
-      "note": "薄さと軽さを優先。256GBを第一候補として比較中。",
       "url": "https://www.apple.com/jp/shop/buy-iphone/iphone-air"
     },
     {
       "id": "ipad-pro-m4-refurb",
-      "category": "タブレット・整備済製品",
       "name": "13インチiPad Pro（M4）",
       "configuration": "シルバー・Wi‑Fi・1TB・Nano-texture",
       "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-compare-header-pro-202405?.v=bk5Ha2llcUlIczRSRUt0WDVzK2I3aEpsdjhCN0cycWFLRklRalhsdmV1Y1k2Q3FubUg5cC93VlMzQkExanhMSzAzOVFHb3N0MkVmS01ZcFh0d1Y4R21yc3hpVFRmZnBDMzlsazg4c2M0Vk0&fmt=png-alpha&hei=398&wid=392",
@@ -51,9 +63,10 @@
         { "label": "ガラス", "value": "Nano-textureガラス" },
         { "label": "カラー", "value": "シルバー" },
         { "label": "接続", "value": "Wi‑Fi" },
-        { "label": "保証", "value": "Apple認定整備済製品・1年間" }
+        { "label": "発売", "value": "2024年5月" },
+        { "label": "整備内容", "value": "新しいバッテリーと外装" },
+        { "label": "保証", "value": "1年間" }
       ],
-      "note": "2024年5月発売。新しいバッテリーと外装を備えたApple認定整備済製品。",
       "url": "https://www.apple.com/jp/shop/product/fwrg3j/a/13インチiPad-ProM4Wi-Fi-1TBNano-textureガラス搭載-シルバー-整備済製品?fnode=ef41226e691f1920e7fbff5513a000a32b1d72a90ee0056f998a16046055642c807b52b49cf17dc4c355856a1abac014e629edc9bd9911438ce20d807dcc94a17dce236162d0c1e00a7e9d1a1de68f4f"
     }
   ]
