@@ -50,7 +50,11 @@ function renderOptions(product) {
   return product.optionOrder.map((key) => {
     const buttons = optionValues(product, key).map((value) => {
       const active = product.selections[key] === value;
-      return `<button type="button" class="${active ? "active" : ""}" data-option="${escapeHtml(key)}" data-value="${escapeHtml(value)}" aria-pressed="${active}">${escapeHtml(value)}</button>`;
+      const color = product.optionColors?.[value];
+      const swatch = key === "color" && /^#[0-9a-f]{6}$/i.test(color || "")
+        ? `<span class="color-swatch" style="--swatch:${color}" aria-hidden="true"></span>`
+        : "";
+      return `<button type="button" class="${key === "color" ? "color-choice " : ""}${active ? "active" : ""}" data-option="${escapeHtml(key)}" data-value="${escapeHtml(value)}" aria-pressed="${active}">${swatch}${escapeHtml(value)}</button>`;
     }).join("");
 
     return `<fieldset class="choice-group"><legend>${escapeHtml(product.optionLabels[key] || key)}</legend><div class="segmented-options option-count-${optionValues(product, key).length}">${buttons}</div></fieldset>`;
@@ -63,7 +67,7 @@ function renderDetails(product) {
     `<div><span>${escapeHtml(detail.label)}</span><strong>${escapeHtml(detail.value)}</strong></div>`,
   ).join("");
 
-  return `<div class="detail-panel"><div class="detail-grid">${details}</div><p class="note">${escapeHtml(product.note)}</p><a href="${escapeHtml(product.url)}" target="_blank" rel="noreferrer">公式ページを開く ↗</a></div>`;
+  return `<div class="detail-panel"><div class="detail-grid">${details}</div><a href="${escapeHtml(product.url)}" target="_blank" rel="noreferrer">公式ページを開く ↗</a></div>`;
 }
 
 function renderProduct(product) {
@@ -76,9 +80,9 @@ function renderProduct(product) {
           <input type="checkbox" aria-label="${escapeHtml(product.name)}を合計に含める" ${product.selected ? "checked" : ""} />
           <span class="custom-check" aria-hidden="true">✓</span>
         </label>
-        <div class="product-visual"><img class="${escapeHtml(product.imageClass || "")}" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.imageAlt)}" /></div>
+        <div class="product-visual"><img class="${escapeHtml(product.imageClass || "")}" src="${escapeHtml(variant.image || product.image)}" alt="${escapeHtml(variant.options.color ? `${variant.options.color}の${product.name}` : product.imageAlt)}" /></div>
         <div class="product-info">
-          <div class="product-heading"><div><p class="category">${escapeHtml(product.category)}</p><h2>${escapeHtml(product.name)}</h2><p class="configuration">${escapeHtml(product.configuration)}</p></div><p class="product-price">${yen.format(variant.price)}</p></div>
+          <div class="product-heading"><div><h2>${escapeHtml(product.name)}</h2><p class="configuration">${escapeHtml(product.configuration)}</p></div><p class="product-price">${yen.format(variant.price)}</p></div>
           ${renderOptions(product)}
           <button class="detail-button" type="button" aria-expanded="${isOpen}">詳細を見る <span class="chevron ${isOpen ? "is-open" : ""}">⌄</span></button>
         </div>
