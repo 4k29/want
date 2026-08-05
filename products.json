@@ -29,33 +29,32 @@
       "url": "https://www.apple.com/jp/shop/buy-iphone/iphone-air"
     },
     {
-      "id": "ipad-pro-13",
-      "category": "タブレット",
-      "name": "13インチiPad Pro",
-      "configuration": "スペースブラック・Wi‑Fi",
+      "id": "ipad-pro-m4-refurb",
+      "category": "タブレット・整備済製品",
+      "name": "13インチiPad Pro（M4）",
+      "configuration": "シルバー・Wi‑Fi・1TB・Nano-texture",
       "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-compare-header-pro-202405?.v=bk5Ha2llcUlIczRSRUt0WDVzK2I3aEpsdjhCN0cycWFLRklRalhsdmV1Y1k2Q3FubUg5cC93VlMzQkExanhMSzAzOVFHb3N0MkVmS01ZcFh0d1Y4R21yc3hpVFRmZnBDMzlsazg4c2M0Vk0&fmt=png-alpha&hei=398&wid=392",
-      "imageAlt": "スペースブラックのiPad Pro",
+      "imageAlt": "13インチiPad Pro（M4）",
       "imageClass": "ipad-image",
       "selected": true,
-      "defaultVariant": 4,
-      "optionOrder": ["glass", "storage"],
-      "optionLabels": { "glass": "ディスプレイガラス", "storage": "ストレージ" },
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
       "variants": [
-        { "options": { "glass": "標準", "storage": "256GB" }, "price": 269800 },
-        { "options": { "glass": "標準", "storage": "512GB" }, "price": 304800 },
-        { "options": { "glass": "標準", "storage": "1TB" }, "price": 374800 },
-        { "options": { "glass": "標準", "storage": "2TB" }, "price": 464800 },
-        { "options": { "glass": "Nano-texture", "storage": "1TB" }, "price": 391800 },
-        { "options": { "glass": "Nano-texture", "storage": "2TB" }, "price": 481800 }
+        { "options": {}, "price": 311800 }
       ],
       "details": [
         { "label": "ディスプレイ", "value": "13インチ Ultra Retina XDR" },
-        { "label": "チップ", "value": "M5" },
-        { "label": "メモリ", "value": "12GB / 16GB（構成による）" },
-        { "label": "認証", "value": "Face ID" }
+        { "label": "チップ", "value": "Apple M4" },
+        { "label": "ストレージ", "value": "1TB" },
+        { "label": "メモリ", "value": "16GB" },
+        { "label": "ガラス", "value": "Nano-textureガラス" },
+        { "label": "カラー", "value": "シルバー" },
+        { "label": "接続", "value": "Wi‑Fi" },
+        { "label": "保証", "value": "Apple認定整備済製品・1年間" }
       ],
-      "note": "写真編集用。13インチ、Nano-textureガラスを優先。",
-      "url": "https://www.apple.com/jp/shop/buy-ipad/ipad-pro"
+      "note": "2024年5月発売。新しいバッテリーと外装を備えたApple認定整備済製品。",
+      "url": "https://www.apple.com/jp/shop/product/fwrg3j/a/13インチiPad-ProM4Wi-Fi-1TBNano-textureガラス搭載-シルバー-整備済製品?fnode=ef41226e691f1920e7fbff5513a000a32b1d72a90ee0056f998a16046055642c807b52b49cf17dc4c355856a1abac014e629edc9bd9911438ce20d807dcc94a17dce236162d0c1e00a7e9d1a1de68f4f"
     }
   ]
 }
