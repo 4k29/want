@@ -1,6 +1,6 @@
 {
   "budget": 700000,
-  "lastChecked": "2026-08-05",
+  "lastChecked": "2026-08-07",
   "products": [
     {
       "id": "iphone-air",
@@ -11,8 +11,14 @@
       "imageClass": "iphone-image",
       "selected": true,
       "defaultVariant": 6,
-      "optionOrder": ["color", "storage"],
-      "optionLabels": { "color": "カラー", "storage": "ストレージ" },
+      "optionOrder": [
+        "color",
+        "storage"
+      ],
+      "optionLabels": {
+        "color": "カラー",
+        "storage": "ストレージ"
+      },
       "optionColors": {
         "スカイブルー": "#dce8e8",
         "ライトゴールド": "#eee7dc",
@@ -20,24 +26,120 @@
         "スペースブラック": "#2f3030"
       },
       "variants": [
-        { "options": { "color": "スカイブルー", "storage": "256GB" }, "price": 177800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "スカイブルー", "storage": "512GB" }, "price": 212800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "スカイブルー", "storage": "1TB" }, "price": 247800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "ライトゴールド", "storage": "256GB" }, "price": 177800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "ライトゴールド", "storage": "512GB" }, "price": 212800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "ライトゴールド", "storage": "1TB" }, "price": 247800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "クラウドホワイト", "storage": "256GB" }, "price": 177800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "クラウドホワイト", "storage": "512GB" }, "price": 212800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "クラウドホワイト", "storage": "1TB" }, "price": 247800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "スペースブラック", "storage": "256GB" }, "price": 177800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "スペースブラック", "storage": "512GB" }, "price": 212800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" },
-        { "options": { "color": "スペースブラック", "storage": "1TB" }, "price": 247800, "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha" }
+        {
+          "options": {
+            "color": "スカイブルー",
+            "storage": "256GB"
+          },
+          "price": 177800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "スカイブルー",
+            "storage": "512GB"
+          },
+          "price": 212800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "スカイブルー",
+            "storage": "1TB"
+          },
+          "price": 247800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-skyblue-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "ライトゴールド",
+            "storage": "256GB"
+          },
+          "price": 177800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "ライトゴールド",
+            "storage": "512GB"
+          },
+          "price": 212800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "ライトゴールド",
+            "storage": "1TB"
+          },
+          "price": 247800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "クラウドホワイト",
+            "storage": "256GB"
+          },
+          "price": 177800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "クラウドホワイト",
+            "storage": "512GB"
+          },
+          "price": 212800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "クラウドホワイト",
+            "storage": "1TB"
+          },
+          "price": 247800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-cloudwhite-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "スペースブラック",
+            "storage": "256GB"
+          },
+          "price": 177800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "スペースブラック",
+            "storage": "512GB"
+          },
+          "price": 212800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha"
+        },
+        {
+          "options": {
+            "color": "スペースブラック",
+            "storage": "1TB"
+          },
+          "price": 247800,
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-spaceblack-202509?wid=600&hei=600&fmt=png-alpha"
+        }
       ],
       "details": [
-        { "label": "ディスプレイ", "value": "6.5インチ Super Retina XDR" },
-        { "label": "チップ", "value": "A19 Pro" },
-        { "label": "カメラ", "value": "48MP Fusionメイン" },
-        { "label": "重さ", "value": "165 g" }
+        {
+          "label": "ディスプレイ",
+          "value": "6.5インチ Super Retina XDR"
+        },
+        {
+          "label": "チップ",
+          "value": "A19 Pro"
+        },
+        {
+          "label": "カメラ",
+          "value": "48MP Fusionメイン"
+        },
+        {
+          "label": "重さ",
+          "value": "165 g"
+        }
       ],
       "url": "https://www.apple.com/jp-edu/shop/buy-iphone/iphone-air/6.5インチディスプレイ-256gb-クラウドホワイト"
     },
@@ -53,19 +155,52 @@
       "optionOrder": [],
       "optionLabels": {},
       "variants": [
-        { "options": {}, "price": 311800 }
+        {
+          "options": {},
+          "price": 311800
+        }
       ],
       "details": [
-        { "label": "ディスプレイ", "value": "13インチ Ultra Retina XDR" },
-        { "label": "チップ", "value": "Apple M4" },
-        { "label": "ストレージ", "value": "1TB" },
-        { "label": "メモリ", "value": "16GB" },
-        { "label": "ガラス", "value": "Nano-textureガラス" },
-        { "label": "カラー", "value": "シルバー" },
-        { "label": "接続", "value": "Wi‑Fi" },
-        { "label": "発売", "value": "2024年5月" },
-        { "label": "整備内容", "value": "新しいバッテリーと外装" },
-        { "label": "保証", "value": "1年間" }
+        {
+          "label": "ディスプレイ",
+          "value": "13インチ Ultra Retina XDR"
+        },
+        {
+          "label": "チップ",
+          "value": "Apple M4"
+        },
+        {
+          "label": "ストレージ",
+          "value": "1TB"
+        },
+        {
+          "label": "メモリ",
+          "value": "16GB"
+        },
+        {
+          "label": "ガラス",
+          "value": "Nano-textureガラス"
+        },
+        {
+          "label": "カラー",
+          "value": "シルバー"
+        },
+        {
+          "label": "接続",
+          "value": "Wi‑Fi"
+        },
+        {
+          "label": "発売",
+          "value": "2024年5月"
+        },
+        {
+          "label": "整備内容",
+          "value": "新しいバッテリーと外装"
+        },
+        {
+          "label": "保証",
+          "value": "1年間"
+        }
       ],
       "url": "https://www.apple.com/jp/shop/product/fwrg3j/a/13インチiPad-ProM4Wi-Fi-1TBNano-textureガラス搭載-シルバー-整備済製品?fnode=ef41226e691f1920e7fbff5513a000a32b1d72a90ee0056f998a16046055642c807b52b49cf17dc4c355856a1abac014e629edc9bd9911438ce20d807dcc94a17dce236162d0c1e00a7e9d1a1de68f4f"
     },
@@ -81,16 +216,40 @@
       "optionOrder": [],
       "optionLabels": {},
       "variants": [
-        { "options": {}, "price": 594800 }
+        {
+          "options": {},
+          "price": 594800
+        }
       ],
       "details": [
-        { "label": "ディスプレイ", "value": "14インチ・Nano-texture" },
-        { "label": "チップ", "value": "Apple M5 Pro" },
-        { "label": "CPU", "value": "18コア" },
-        { "label": "GPU", "value": "20コア" },
-        { "label": "メモリ", "value": "48GBユニファイドメモリ" },
-        { "label": "ストレージ", "value": "1TB SSD" },
-        { "label": "カラー", "value": "シルバー" }
+        {
+          "label": "ディスプレイ",
+          "value": "14インチ・Nano-texture"
+        },
+        {
+          "label": "チップ",
+          "value": "Apple M5 Pro"
+        },
+        {
+          "label": "CPU",
+          "value": "18コア"
+        },
+        {
+          "label": "GPU",
+          "value": "20コア"
+        },
+        {
+          "label": "メモリ",
+          "value": "48GBユニファイドメモリ"
+        },
+        {
+          "label": "ストレージ",
+          "value": "1TB SSD"
+        },
+        {
+          "label": "カラー",
+          "value": "シルバー"
+        }
       ],
       "url": "https://www.apple.com/jp/shop/buy-mac/macbook-pro/14インチ-silver-nano-textureディスプレイ-apple-m5-pro-チップ-18コアcpu-20コアgpu-48gb-のメモリ-1tb-のストレージ"
     },
@@ -106,14 +265,32 @@
       "optionOrder": [],
       "optionLabels": {},
       "variants": [
-        { "options": {}, "price": 21800 }
+        {
+          "options": {},
+          "price": 21800
+        }
       ],
       "details": [
-        { "label": "操作", "value": "スクイーズ・バレルロール・ダブルタップ" },
-        { "label": "フィードバック", "value": "触覚フィードバック" },
-        { "label": "ペアリングと充電", "value": "マグネット装着" },
-        { "label": "位置確認", "value": "「探す」アプリ対応" },
-        { "label": "型番", "value": "MX2D3ZA/A" }
+        {
+          "label": "操作",
+          "value": "スクイーズ・バレルロール・ダブルタップ"
+        },
+        {
+          "label": "フィードバック",
+          "value": "触覚フィードバック"
+        },
+        {
+          "label": "ペアリングと充電",
+          "value": "マグネット装着"
+        },
+        {
+          "label": "位置確認",
+          "value": "「探す」アプリ対応"
+        },
+        {
+          "label": "型番",
+          "value": "MX2D3ZA/A"
+        }
       ],
       "url": "https://www.apple.com/jp-edu/shop/product/mx2d3za/a/apple-pencil-pro"
     },
@@ -129,14 +306,32 @@
       "optionOrder": [],
       "optionLabels": {},
       "variants": [
-        { "options": {}, "price": 11460 }
+        {
+          "options": {},
+          "price": 11460
+        }
       ],
       "details": [
-        { "label": "対応機種", "value": "13インチiPad Pro（M4/M5）" },
-        { "label": "カラー", "value": "ミストブルー × ミスティグレー" },
-        { "label": "オプション", "value": "ペンスロット付きのセット" },
-        { "label": "素材", "value": "MOVAS™" },
-        { "label": "Apple Pencil", "value": "第1世代はペンスロット非対応" }
+        {
+          "label": "対応機種",
+          "value": "13インチiPad Pro（M4/M5）"
+        },
+        {
+          "label": "カラー",
+          "value": "ミストブルー × ミスティグレー"
+        },
+        {
+          "label": "オプション",
+          "value": "ペンスロット付きのセット"
+        },
+        {
+          "label": "素材",
+          "value": "MOVAS™"
+        },
+        {
+          "label": "Apple Pencil",
+          "value": "第1世代はペンスロット非対応"
+        }
       ],
       "url": "https://www.moftjapan.com/collections/tablet/products/dynamic-folio?variant=46945367097601"
     },
@@ -152,17 +347,84 @@
       "optionOrder": [],
       "optionLabels": {},
       "variants": [
-        { "options": {}, "price": 86800 }
+        {
+          "options": {},
+          "price": 86800
+        }
       ],
       "details": [
-        { "label": "ケース", "value": "46mm・シルバーアルミニウム" },
-        { "label": "通信", "value": "GPS + Cellular" },
-        { "label": "バンド", "value": "ベールドグレーNikeスポーツバンド" },
-        { "label": "バンドサイズ", "value": "M/L" },
-        { "label": "バッテリー", "value": "最大24時間" },
-        { "label": "ストア", "value": "学生・教職員向け" }
+        {
+          "label": "ケース",
+          "value": "46mm・シルバーアルミニウム"
+        },
+        {
+          "label": "通信",
+          "value": "GPS + Cellular"
+        },
+        {
+          "label": "バンド",
+          "value": "ベールドグレーNikeスポーツバンド"
+        },
+        {
+          "label": "バンドサイズ",
+          "value": "M/L"
+        },
+        {
+          "label": "バッテリー",
+          "value": "最大24時間"
+        },
+        {
+          "label": "ストア",
+          "value": "学生・教職員向け"
+        }
       ],
       "url": "https://www.apple.com/jp-edu/shop/buy-watch/apple-watch/46mm-cellularモデル-silver-アルミニウム-ベールドグレー-nikeスポーツバンド-m-l"
+    },
+    {
+      "id": "zr-d595fe6",
+      "name": "ZR",
+      "configuration": "Nikon",
+      "image": "https://nij.nikon.com/ec/img/goods/L/4960759919656.jpg",
+      "imageAlt": "ZR",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 374000,
+          "image": "https://nij.nikon.com/ec/img/goods/L/4960759919656.jpg"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Nikon"
+        },
+        {
+          "label": "SKU",
+          "value": "4960759919656"
+        },
+        {
+          "label": "カテゴリ",
+          "value": "カメラ用アクセサリー"
+        },
+        {
+          "label": "製品情報",
+          "value": "2025/10/24 発売・JANコード 4960759919656"
+        },
+        {
+          "label": "概要",
+          "value": "ZRの購入はこちら。公式通販 ニコンダイレクト"
+        },
+        {
+          "label": "販売元",
+          "value": "Nikon"
+        }
+      ],
+      "url": "https://nij.nikon.com/shop/g/g4960759919656/"
     }
   ]
 }
