@@ -638,6 +638,52 @@
         }
       ],
       "url": "https://nij.nikon.com/shop/g/g4955478187615/"
+    },
+    {
+      "id": "nd-nextorage-165gb-cfexpress-type-b-nx-b2p-c3bdc6f",
+      "name": "ND Nextorage 165GB CFexpress Type B メモリーカード NX-B2PRO",
+      "configuration": "Nikon",
+      "image": "https://nij.nikon.com/ec/img/goods/L/4955478186885.jpg",
+      "imageAlt": "ND Nextorage 165GB CFexpress Type B メモリーカード NX-B2PRO",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 38600,
+          "image": "https://nij.nikon.com/ec/img/goods/L/4955478186885.jpg"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Nikon"
+        },
+        {
+          "label": "SKU",
+          "value": "4955478186885"
+        },
+        {
+          "label": "カテゴリ",
+          "value": "カメラ用アクセサリー"
+        },
+        {
+          "label": "製品情報",
+          "value": "2025/04/16 発売・JANコード 4955478186885"
+        },
+        {
+          "label": "概要",
+          "value": "ND Nextorage 165GB CFexpress Type B メモリーカードの購入はこちら。B2PRO -公式通販 ニコンダイレクト"
+        },
+        {
+          "label": "販売元",
+          "value": "Nikon"
+        }
+      ],
+      "url": "https://nij.nikon.com/shop/g/g4955478186885/"
     }
   ]
 }
