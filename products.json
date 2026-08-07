@@ -684,6 +684,48 @@
         }
       ],
       "url": "https://nij.nikon.com/shop/g/g4955478186885/"
+    },
+    {
+      "id": "flow-2-for-mac-4481069",
+      "name": "Flow 2 for Mac",
+      "configuration": "Lofree Japan",
+      "image": "https://lofree.co.jp/cdn/shop/files/39.webp?v=1780478207&width=1920",
+      "imageAlt": "Flow 2 for Mac",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 33000,
+          "image": "https://lofree.co.jp/cdn/shop/files/39.webp?v=1780478207&width=1920"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Lofree Japan"
+        },
+        {
+          "label": "SKU",
+          "value": "4570215171155"
+        },
+        {
+          "label": "在庫",
+          "value": "InStock"
+        },
+        {
+          "label": "概要",
+          "value": "Lofree Flow 2 for Macは、Macユーザーが自然に操作できるキー配列を採用したロープロファイルメカニカルキーボードです。Fn／Globe、Control、Option、CommandキーをMac標準の並びに配置。CNC一体削り出し薄型アルミニウムボディに、VIA設定機能、ガスケットマウント構造、専用タッチバー、Bluetooth・2.4GHz・USB-C有線の3方式接続を標準搭載しています。デスクを広く使える84キーモデルと、数字入力に便利な100キーモデルから選べます"
+        },
+        {
+          "label": "販売元",
+          "value": "Lofree Japan"
+        }
+      ],
+      "url": "https://lofree.co.jp/products/flow-2-for-mac"
     }
   ]
 }
