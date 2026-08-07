@@ -111,9 +111,11 @@ function renderDetails(product, variant) {
   const details = detailsFor(product, variant).map((detail) =>
     `<div><span>${escapeHtml(detail.label)}</span><strong>${escapeHtml(detail.value)}</strong></div>`,
   ).join("");
+  const hasVariantUrl = Boolean(variant.url);
   const url = variant.url || product.url;
+  const linkLabel = hasVariantUrl ? "この構成を公式ページで開く ↗" : "公式ページを開く ↗";
 
-  return `<div class="detail-panel"><div class="detail-grid">${details}</div><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">この構成を公式ページで開く ↗</a></div>`;
+  return `<div class="detail-panel"><div class="detail-grid">${details}</div><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${linkLabel}</a></div>`;
 }
 
 function renderProduct(product) {
