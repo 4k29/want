@@ -8,12 +8,16 @@
   const displays = ["標準", "Nano-texture"];
   const nanoPrice = 27000;
 
+  // Appleの学生・教職員向けストアでは、14インチMacBook Proの
+  // M5 Proモデルは通常価格から25,000円、M5 Maxモデルは50,000円引き。
+  // メモリ・ストレージ・Nano-textureなどの構成差額は通常ストアと同額。
   const chips = [
     {
       value: "M5 Pro 15CPU / 16GPU",
       family: "M5 Pro",
       cpu: "15コア",
       gpu: "16コア",
+      educationDiscount: 25000,
       configurations: {
         "24GB": { "1TB": 429800, "2TB": 519800 },
         "48GB": { "1TB": 537800, "2TB": 626800 },
@@ -24,6 +28,7 @@
       family: "M5 Pro",
       cpu: "18コア",
       gpu: "20コア",
+      educationDiscount: 25000,
       configurations: {
         "24GB": { "1TB": 459800, "2TB": 549800 },
         "48GB": { "1TB": 567800, "2TB": 657800 },
@@ -35,6 +40,7 @@
       family: "M5 Max",
       cpu: "18コア",
       gpu: "32コア",
+      educationDiscount: 50000,
       configurations: {
         "36GB": { "2TB": 699800 },
       },
@@ -44,6 +50,7 @@
       family: "M5 Max",
       cpu: "18コア",
       gpu: "40コア",
+      educationDiscount: 50000,
       configurations: {
         "48GB": { "2TB": 807800 },
         "64GB": { "2TB": 879800 },
@@ -57,20 +64,20 @@
   const chipSlug = (chip) => chip.family === "M5 Max" ? "apple-m5-max-チップ" : "apple-m5-pro-チップ";
 
   const buildMacUrl = ({ color, display, chip, memory, storage }) =>
-    `https://www.apple.com/jp/shop/buy-mac/macbook-pro/14インチ-${colorSlug(color)}-${displaySlug(display)}-${chipSlug(chip)}-${chip.cpu.replace("コア", "コアcpu")}-${chip.gpu.replace("コア", "コアgpu")}-${memory.toLowerCase()}-のメモリ-${storage.toLowerCase()}-のストレージ`;
+    `https://www.apple.com/jp-edu/shop/buy-mac/macbook-pro/14インチ-${colorSlug(color)}-${displaySlug(display)}-${chipSlug(chip)}-${chip.cpu.replace("コア", "コアcpu")}-${chip.gpu.replace("コア", "コアgpu")}-${memory.toLowerCase()}-のメモリ-${storage.toLowerCase()}-のストレージ`;
 
   const macVariants = [];
   for (const color of colors) {
     for (const display of displays) {
       for (const chip of chips) {
         for (const [memory, storagePrices] of Object.entries(chip.configurations)) {
-          for (const [storage, basePrice] of Object.entries(storagePrices)) {
+          for (const [storage, regularPrice] of Object.entries(storagePrices)) {
             const options = { color, display, chip: chip.value, memory, storage };
             macVariants.push({
               options,
-              price: basePrice + (display === "Nano-texture" ? nanoPrice : 0),
+              price: regularPrice - chip.educationDiscount + (display === "Nano-texture" ? nanoPrice : 0),
               image: macImages[color],
-              configuration: `${color}・${display}・${chip.value}・${memory}・${storage}`,
+              configuration: `${color}・${display}・${chip.value}・${memory}・${storage}・学生・教職員向けストア`,
               url: buildMacUrl({ color, display, chip, memory, storage }),
             });
           }
