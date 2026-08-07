@@ -125,7 +125,7 @@ function bindProductEvents() {
 
 function render() {
   productList.innerHTML = state.products.map(renderProduct).join("") + `
-    <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・在庫を自動確認します。</p></div></a>`;
+    <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・詳細を取得してこのページに自動追加・更新します。</p></div></a>`;
   renderSummary();
   bindProductEvents();
 }
