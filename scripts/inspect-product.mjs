@@ -21,8 +21,8 @@ if (hostname === "localhost" || hostname.endsWith(".local") || privateIpv4 || (i
 const response = await fetch(inputUrl, {
   redirect: "follow",
   headers: {
-    "User-Agent": "Mozilla/5.0 (compatible; WantListProductInspector/2.0)",
-    "Accept-Language": "ja,en;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0 Safari/537.36",
+    "Accept-Language": "ja-JP,ja;q=0.9,en;q=0.7",
   },
 });
 if (!response.ok) throw new Error(`商品ページを取得できませんでした（HTTP ${response.status}）。`);
@@ -35,6 +35,7 @@ const decode = (value = "") => String(value)
   .replaceAll("&lt;", "<")
   .replaceAll("&gt;", ">");
 const cleanText = (value = "") => decode(String(value)).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+const pageText = cleanText(html);
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const meta = (key) => {
   const escaped = escapeRegex(key);
@@ -44,6 +45,10 @@ const meta = (key) => {
   ];
   return cleanText(patterns.map((pattern) => html.match(pattern)?.[1]).find(Boolean) || "");
 };
+const elementText = (pattern) => cleanText(html.match(pattern)?.[1] || "");
+const issueOverride = (label) => cleanText(issueBody.match(new RegExp(`(?:^|\\n)\\s*${label}\\s*[:：]\\s*(.+)`, "im"))?.[1] || "");
+const overrideName = issueOverride("商品名");
+const overridePrice = issueOverride("価格").replace(/[^0-9.]/g, "");
 
 const jsonLd = [];
 for (const script of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
@@ -62,11 +67,40 @@ const product = flatten(jsonLd).find((item) => {
 const offers = Array.isArray(product.offers) ? product.offers : (product.offers ? [product.offers] : []);
 const offer = offers.find((item) => item?.price || item?.lowPrice) || offers[0] || {};
 const imageValue = Array.isArray(product.image) ? product.image[0] : product.image;
-const image = typeof imageValue === "string" ? imageValue : (imageValue?.url || imageValue?.contentUrl || meta("og:image"));
-const brandValue = typeof product.brand === "string" ? product.brand : product.brand?.name;
+let image = typeof imageValue === "string" ? imageValue : (imageValue?.url || imageValue?.contentUrl || meta("og:image"));
+let brandValue = typeof product.brand === "string" ? product.brand : product.brand?.name;
 const manufacturerValue = typeof product.manufacturer === "string" ? product.manufacturer : product.manufacturer?.name;
 const rawAvailability = offer.availability || meta("product:availability");
 const additionalProperties = Array.isArray(product.additionalProperty) ? product.additionalProperty : [];
+
+let fallbackName = "";
+let fallbackPrice = "";
+let fallbackSku = "";
+let fallbackDescription = "";
+let fallbackCategory = "";
+
+if (hostname === "nij.nikon.com" || hostname.endsWith(".nikon.com")) {
+  fallbackName = elementText(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  fallbackPrice = pageText.match(/ニコンダイレクト販売価格[\s\S]{0,160}?([0-9]{1,3}(?:,[0-9]{3})+)\s*円/)?.[1]?.replaceAll(",", "") || "";
+  fallbackSku = pageText.match(/JANコード\s*[:：]\s*([0-9]{8,14})/)?.[1] || "";
+  fallbackCategory = pageText.includes("Zマウントレンズ") ? "Zマウントレンズ" : pageText.includes("メモリーカード") ? "カメラ用アクセサリー" : pageText.includes("Z CINEMA") ? "Z CINEMA" : "Nikon製品";
+  const release = pageText.match(/([0-9]{4}\/[0-9]{2}\/[0-9]{2})\s*発売/)?.[1];
+  fallbackDescription = [release ? `${release} 発売` : "", fallbackSku ? `JANコード ${fallbackSku}` : ""].filter(Boolean).join("・");
+  brandValue ||= "Nikon";
+  if (!image && fallbackSku) image = `https://nij.nikon.com/ec/img/goods/L/${fallbackSku}.jpg`;
+}
+
+if (hostname === "amazon.co.jp" || hostname.endsWith(".amazon.co.jp")) {
+  fallbackName = elementText(/<span[^>]+id=["']productTitle["'][^>]*>([\s\S]*?)<\/span>/i)
+    || cleanText(html.match(/"TURBO_CHECKOUT_HEADER"\s*:\s*"今すぐ購入：([^"]+)"/i)?.[1] || "");
+  fallbackPrice = (
+    elementText(/<span[^>]+class=["'][^"']*a-price-whole[^"']*["'][^>]*>([\s\S]*?)<\/span>/i)
+    || html.match(/"priceAmount"\s*:\s*([0-9.]+)/i)?.[1]
+    || ""
+  ).replace(/[^0-9.]/g, "");
+  fallbackSku = html.match(/data-csa-c-asin=["']([A-Z0-9]{10})["']/i)?.[1] || "";
+  fallbackCategory = "スマートフォンアクセサリー";
+}
 
 const details = [];
 const addDetail = (label, value) => {
@@ -77,9 +111,10 @@ const addDetail = (label, value) => {
 
 addDetail("ブランド", brandValue || manufacturerValue);
 addDetail("型番", product.mpn || product.model);
-addDetail("SKU", product.sku);
-addDetail("カテゴリ", product.category);
+addDetail("SKU", product.sku || fallbackSku);
+addDetail("カテゴリ", product.category || fallbackCategory);
 addDetail("在庫", String(rawAvailability || "").split("/").pop());
+if (fallbackDescription) addDetail("製品情報", fallbackDescription);
 for (const property of additionalProperties.slice(0, 12)) {
   addDetail(property?.name || property?.propertyID, property?.value);
 }
@@ -87,13 +122,13 @@ for (const property of additionalProperties.slice(0, 12)) {
 const result = {
   url: response.url,
   sourceHost: new URL(response.url).hostname,
-  name: cleanText(product.name || meta("og:title") || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || ""),
-  description: cleanText(product.description || meta("og:description") || meta("description")).slice(0, 320),
+  name: overrideName || cleanText(product.name || fallbackName || meta("og:title") || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || ""),
+  description: cleanText(product.description || meta("og:description") || meta("description") || fallbackDescription).slice(0, 320),
   brand: cleanText(brandValue || manufacturerValue),
-  sku: cleanText(product.sku || ""),
+  sku: cleanText(product.sku || fallbackSku || ""),
   mpn: cleanText(product.mpn || product.model || ""),
-  category: cleanText(product.category || ""),
-  price: String(offer.price || offer.lowPrice || meta("product:price:amount") || "").replace(/[^0-9.]/g, "").trim(),
+  category: cleanText(product.category || fallbackCategory || ""),
+  price: String(overridePrice || offer.price || offer.lowPrice || meta("product:price:amount") || fallbackPrice || "").replace(/[^0-9.]/g, "").trim(),
   priceCurrency: String(offer.priceCurrency || meta("product:price:currency") || "JPY").trim(),
   availability: String(rawAvailability || "").split("/").pop(),
   image: /^https?:\/\//i.test(image || "") ? image : "",
