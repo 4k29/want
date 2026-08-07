@@ -80,11 +80,13 @@ let fallbackDescription = "";
 let fallbackCategory = "";
 
 if (hostname === "nij.nikon.com" || hostname.endsWith(".nikon.com")) {
-  fallbackName = elementText(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-  fallbackPrice = pageText.match(/ニコンダイレクト販売価格[\s\S]{0,160}?([0-9]{1,3}(?:,[0-9]{3})+)\s*円/)?.[1]?.replaceAll(",", "") || "";
-  fallbackSku = pageText.match(/JANコード\s*[:：]\s*([0-9]{8,14})/)?.[1] || "";
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  fallbackName = cleanText(h1Match?.[1] || "");
+  const productSectionText = h1Match?.index != null ? cleanText(html.slice(h1Match.index, h1Match.index + 12000)) : pageText;
+  fallbackPrice = productSectionText.match(/ニコンダイレクト販売価格[\s\S]{0,180}?([0-9]{1,3}(?:,[0-9]{3})+)\s*円/)?.[1]?.replaceAll(",", "") || "";
+  fallbackSku = productSectionText.match(/JANコード\s*[:：]\s*([0-9]{8,14})/)?.[1] || pageText.match(/JANコード\s*[:：]\s*([0-9]{8,14})/)?.[1] || "";
   fallbackCategory = pageText.includes("Zマウントレンズ") ? "Zマウントレンズ" : pageText.includes("メモリーカード") ? "カメラ用アクセサリー" : pageText.includes("Z CINEMA") ? "Z CINEMA" : "Nikon製品";
-  const release = pageText.match(/([0-9]{4}\/[0-9]{2}\/[0-9]{2})\s*発売/)?.[1];
+  const release = productSectionText.match(/([0-9]{4}\/[0-9]{2}\/[0-9]{2})\s*発売/)?.[1];
   fallbackDescription = [release ? `${release} 発売` : "", fallbackSku ? `JANコード ${fallbackSku}` : ""].filter(Boolean).join("・");
   brandValue ||= "Nikon";
   if (!image && fallbackSku) image = `https://nij.nikon.com/ec/img/goods/L/${fallbackSku}.jpg`;
