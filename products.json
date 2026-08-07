@@ -425,6 +425,52 @@
         }
       ],
       "url": "https://nij.nikon.com/shop/g/g4960759919656/"
+    },
+    {
+      "id": "nikkor-z-28-135mm-f-4-pz-5582c31",
+      "name": "NIKKOR Z 28-135mm f/4 PZ",
+      "configuration": "Nikon",
+      "image": "https://nij.nikon.com/ec/img/goods/L/4960759915955.jpg",
+      "imageAlt": "NIKKOR Z 28-135mm f/4 PZ",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 28600,
+          "image": "https://nij.nikon.com/ec/img/goods/L/4960759915955.jpg"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Nikon"
+        },
+        {
+          "label": "SKU",
+          "value": "4960759915955"
+        },
+        {
+          "label": "カテゴリ",
+          "value": "Zマウントレンズ"
+        },
+        {
+          "label": "製品情報",
+          "value": "2025/04/25 発売・JANコード 4960759915955"
+        },
+        {
+          "label": "概要",
+          "value": "NIKKOR Z 28-135mm f/4 PZの購入はこちら。公式通販 ニコンダイレクト"
+        },
+        {
+          "label": "販売元",
+          "value": "Nikon"
+        }
+      ],
+      "url": "https://nij.nikon.com/shop/g/g4960759915955/"
     }
   ]
 }
