@@ -517,6 +517,52 @@
         }
       ],
       "url": "https://nij.nikon.com/shop/g/g4960759915917/"
+    },
+    {
+      "id": "nd-nextorage-cfexpress-type-b-usb-40gbps-8a11cd3",
+      "name": "ND Nextorage CFexpress Type B カードリーダー USB 40Gbps",
+      "configuration": "Nikon",
+      "image": "https://nij.nikon.com/ec/img/goods/L/4955478186922.jpg",
+      "imageAlt": "ND Nextorage CFexpress Type B カードリーダー USB 40Gbps",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 38600,
+          "image": "https://nij.nikon.com/ec/img/goods/L/4955478186922.jpg"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Nikon"
+        },
+        {
+          "label": "SKU",
+          "value": "4955478186922"
+        },
+        {
+          "label": "カテゴリ",
+          "value": "カメラ用アクセサリー"
+        },
+        {
+          "label": "製品情報",
+          "value": "2025/04/16 発売・JANコード 4955478186922"
+        },
+        {
+          "label": "概要",
+          "value": "ND Nextorage CFexpress Type B カードリーダー USB 40Gbpsの購入はこちら。公式通販 ニコンダイレクト"
+        },
+        {
+          "label": "販売元",
+          "value": "Nikon"
+        }
+      ],
+      "url": "https://nij.nikon.com/shop/g/g4955478186922/"
     }
   ]
 }
