@@ -592,6 +592,52 @@
         }
       ],
       "url": "https://www.amazon.co.jp/PDA%E5%B7%A5%E6%88%BF-iPhone-%E7%B4%94%E9%BB%92%E3%82%AF%E3%83%AA%E3%82%A2-%E8%B6%85%E5%8F%8D%E5%B0%84%E9%98%B2%E6%AD%A2-%E3%83%95%E3%82%A3%E3%83%AB%E3%83%A0/dp/B0FQJ54QPC"
+    },
+    {
+      "id": "zr-ee26373",
+      "name": "ZR用液晶保護フィルム",
+      "configuration": "Nikon",
+      "image": "https://nij.nikon.com/ec/img/goods/L/4955478187615.jpg",
+      "imageAlt": "ZR用液晶保護フィルム",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 2750,
+          "image": "https://nij.nikon.com/ec/img/goods/L/4955478187615.jpg"
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "Nikon"
+        },
+        {
+          "label": "SKU",
+          "value": "4955478187615"
+        },
+        {
+          "label": "カテゴリ",
+          "value": "Nikon製品"
+        },
+        {
+          "label": "製品情報",
+          "value": "2025/10/24 発売・JANコード 4955478187615"
+        },
+        {
+          "label": "概要",
+          "value": "ZR用液晶保護フィルムの購入はこちら。公式通販 ニコンダイレクト"
+        },
+        {
+          "label": "販売元",
+          "value": "Nikon"
+        }
+      ],
+      "url": "https://nij.nikon.com/shop/g/g4955478187615/"
     }
   ]
 }
