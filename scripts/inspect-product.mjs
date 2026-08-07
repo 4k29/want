@@ -21,7 +21,7 @@ if (hostname === "localhost" || hostname.endsWith(".local") || privateIpv4 || (i
 const response = await fetch(inputUrl, {
   redirect: "follow",
   headers: {
-    "User-Agent": "Mozilla/5.0 (compatible; WantListProductInspector/1.0)",
+    "User-Agent": "Mozilla/5.0 (compatible; WantListProductInspector/2.0)",
     "Accept-Language": "ja,en;q=0.8",
   },
 });
@@ -34,6 +34,7 @@ const decode = (value = "") => String(value)
   .replaceAll("&#39;", "'")
   .replaceAll("&lt;", "<")
   .replaceAll("&gt;", ">");
+const cleanText = (value = "") => decode(String(value)).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const meta = (key) => {
   const escaped = escapeRegex(key);
@@ -41,7 +42,7 @@ const meta = (key) => {
     new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']+)["'][^>]*>`, "i"),
     new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${escaped}["'][^>]*>`, "i"),
   ];
-  return decode(patterns.map((pattern) => html.match(pattern)?.[1]).find(Boolean) || "");
+  return cleanText(patterns.map((pattern) => html.match(pattern)?.[1]).find(Boolean) || "");
 };
 
 const jsonLd = [];
@@ -57,18 +58,49 @@ const product = flatten(jsonLd).find((item) => {
   const types = Array.isArray(item["@type"]) ? item["@type"] : [item["@type"]];
   return types.includes("Product");
 }) || {};
-const offer = Array.isArray(product.offers) ? product.offers[0] : (product.offers || {});
+
+const offers = Array.isArray(product.offers) ? product.offers : (product.offers ? [product.offers] : []);
+const offer = offers.find((item) => item?.price || item?.lowPrice) || offers[0] || {};
 const imageValue = Array.isArray(product.image) ? product.image[0] : product.image;
 const image = typeof imageValue === "string" ? imageValue : (imageValue?.url || imageValue?.contentUrl || meta("og:image"));
+const brandValue = typeof product.brand === "string" ? product.brand : product.brand?.name;
+const manufacturerValue = typeof product.manufacturer === "string" ? product.manufacturer : product.manufacturer?.name;
 const rawAvailability = offer.availability || meta("product:availability");
+const additionalProperties = Array.isArray(product.additionalProperty) ? product.additionalProperty : [];
+
+const details = [];
+const addDetail = (label, value) => {
+  const text = cleanText(value);
+  if (!text || details.some((item) => item.label === label && item.value === text)) return;
+  details.push({ label, value: text.slice(0, 220) });
+};
+
+addDetail("ブランド", brandValue || manufacturerValue);
+addDetail("型番", product.mpn || product.model);
+addDetail("SKU", product.sku);
+addDetail("カテゴリ", product.category);
+addDetail("在庫", String(rawAvailability || "").split("/").pop());
+for (const property of additionalProperties.slice(0, 12)) {
+  addDetail(property?.name || property?.propertyID, property?.value);
+}
 
 const result = {
   url: response.url,
-  name: decode(product.name || meta("og:title") || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").trim(),
-  price: String(offer.price || offer.lowPrice || meta("product:price:amount") || "").trim(),
-  priceCurrency: String(offer.priceCurrency || meta("product:price:currency") || "").trim(),
+  sourceHost: new URL(response.url).hostname,
+  name: cleanText(product.name || meta("og:title") || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || ""),
+  description: cleanText(product.description || meta("og:description") || meta("description")).slice(0, 320),
+  brand: cleanText(brandValue || manufacturerValue),
+  sku: cleanText(product.sku || ""),
+  mpn: cleanText(product.mpn || product.model || ""),
+  category: cleanText(product.category || ""),
+  price: String(offer.price || offer.lowPrice || meta("product:price:amount") || "").replace(/[^0-9.]/g, "").trim(),
+  priceCurrency: String(offer.priceCurrency || meta("product:price:currency") || "JPY").trim(),
   availability: String(rawAvailability || "").split("/").pop(),
   image: /^https?:\/\//i.test(image || "") ? image : "",
+  details,
 };
+
+if (!result.name) throw new Error("商品名を取得できませんでした。");
+if (!result.price || Number.isNaN(Number(result.price))) throw new Error("価格を取得できませんでした。");
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
