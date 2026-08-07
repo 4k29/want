@@ -563,6 +563,35 @@
         }
       ],
       "url": "https://nij.nikon.com/shop/g/g4955478186922/"
+    },
+    {
+      "id": "pda-iphone-air-9002e25",
+      "name": "PDA工房 iPhone Air 対応 純黒クリア[超反射防止] 保護 フィルム [画面用] 反射低減 防指紋 日本製",
+      "configuration": "スマートフォンアクセサリー",
+      "image": "",
+      "imageAlt": "PDA工房 iPhone Air 対応 純黒クリア[超反射防止] 保護 フィルム [画面用] 反射低減 防指紋 日本製",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 1375
+        }
+      ],
+      "details": [
+        {
+          "label": "カテゴリ",
+          "value": "スマートフォンアクセサリー"
+        },
+        {
+          "label": "販売元",
+          "value": "www.amazon.co.jp"
+        }
+      ],
+      "url": "https://www.amazon.co.jp/PDA%E5%B7%A5%E6%88%BF-iPhone-%E7%B4%94%E9%BB%92%E3%82%AF%E3%83%AA%E3%82%A2-%E8%B6%85%E5%8F%8D%E5%B0%84%E9%98%B2%E6%AD%A2-%E3%83%95%E3%82%A3%E3%83%AB%E3%83%A0/dp/B0FQJ54QPC"
     }
   ]
 }
