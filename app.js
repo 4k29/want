@@ -8,7 +8,7 @@ const state = {
   catalog: null,
   products: [],
   openDetail: null,
-  activeView: ["apple", "camera", "payment"].includes(location.hash.slice(1))
+  activeView: ["apple", "camera", "other", "payment"].includes(location.hash.slice(1))
     ? location.hash.slice(1)
     : "apple",
   financeProductIds: new Set(["iphone-air", "ipad-pro-m4-refurb", "apple-watch-series-11"]),
@@ -35,11 +35,17 @@ const CAMERA_PRODUCT_IDS = new Set([
 ]);
 
 const PRODUCT_GROUPS = [
-  { id: "apple", number: "01", title: "Apple製品", test: (product) => !CAMERA_PRODUCT_IDS.has(product.id) },
-  { id: "camera", number: "02", title: "カメラ", test: (product) => CAMERA_PRODUCT_IDS.has(product.id) },
+  { id: "apple", number: "01", title: "Apple製品", test: (product) => productCategory(product) === "apple" },
+  { id: "camera", number: "02", title: "カメラ", test: (product) => productCategory(product) === "camera" },
+  { id: "other", number: "03", title: "その他", test: (product) => productCategory(product) === "other" },
 ];
 
 const STORAGE_KEY = "want-payment-settings-v1";
+
+function productCategory(product) {
+  if (["apple", "camera", "other"].includes(product.listCategory)) return product.listCategory;
+  return CAMERA_PRODUCT_IDS.has(product.id) ? "camera" : "apple";
+}
 
 const productList = document.querySelector("#product-list");
 productList.append(document.querySelector("#loading-template").content.cloneNode(true));
@@ -145,8 +151,9 @@ function renderDetails(product, variant) {
   const hasVariantUrl = Boolean(variant.url);
   const url = variant.url || product.url;
   const linkLabel = hasVariantUrl ? "この構成を公式ページで開く ↗" : "公式ページを開く ↗";
+  const deleteUrl = `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(`[商品削除] ${product.name}`)}&body=${encodeURIComponent(`商品ID: ${product.id}\n\n商品名: ${product.name}\n\nこの商品を欲しいものリストから削除します。`)}`;
 
-  return `<div class="detail-panel"><div class="detail-grid">${details}</div><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${linkLabel}</a></div>`;
+  return `<div class="detail-panel"><div class="detail-grid">${details}</div><div class="detail-actions"><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${linkLabel}</a><a class="delete-product-link" href="${escapeHtml(deleteUrl)}" target="_blank" rel="noreferrer">リストから削除 ↗</a></div></div>`;
 }
 
 function renderProduct(product) {
@@ -403,6 +410,9 @@ function bindPaymentEvents() {
       price: Number(priceInput.value) || 0,
       cycle: cycleInput.value === "yearly" ? "yearly" : "monthly",
     });
+    nameInput.value = "";
+    priceInput.value = "";
+    cycleInput.value = "monthly";
     savePaymentSettings();
     renderPayments();
   };
@@ -465,6 +475,7 @@ function renderPayments() {
     </section>`;
 
   bindPaymentEvents();
+  document.querySelectorAll("#payment-simulator input").forEach((input) => input.setAttribute("enterkeyhint", "done"));
   updatePaymentResults();
 }
 
@@ -522,7 +533,7 @@ function render() {
   </section>`;
 
   productList.innerHTML = groupMarkup + `
-    <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・詳細を取得してこのページに自動追加・更新します。</p></div></a>`;
+    <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLとカテゴリーを選ぶと、商品名・価格・画像・詳細を取得して自動追加・更新します。</p></div></a>`;
   productList.setAttribute("aria-label", `${group.title}の欲しいもの`);
   renderSummary();
   bindProductEvents();
@@ -552,8 +563,21 @@ async function start() {
 
 start();
 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && event.target.matches("input")) {
+    setTimeout(() => event.target.blur(), 0);
+  }
+});
+
+document.addEventListener("pointerdown", (event) => {
+  const active = document.activeElement;
+  if (active?.matches("input, textarea") && !event.target.closest("input, textarea, select")) {
+    active.blur();
+  }
+});
+
 window.addEventListener("hashchange", () => {
-  const nextView = ["apple", "camera", "payment"].includes(location.hash.slice(1))
+  const nextView = ["apple", "camera", "other", "payment"].includes(location.hash.slice(1))
     ? location.hash.slice(1)
     : "apple";
   if (nextView !== state.activeView) {

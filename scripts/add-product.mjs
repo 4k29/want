@@ -39,6 +39,9 @@ const product = {
   id: existing?.id || `${idBase}-${suffix}`,
   name: result.name,
   configuration: result.brand || result.category || result.sourceHost || "リンクから自動追加",
+  listCategory: ["apple", "camera", "other"].includes(result.listCategory)
+    ? result.listCategory
+    : (existing?.listCategory || "other"),
   image: result.image || existing?.image || "",
   imageAlt: result.name,
   imageClass: existing?.imageClass || "",

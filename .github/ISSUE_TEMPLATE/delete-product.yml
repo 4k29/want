@@ -1,0 +1,21 @@
+name: 商品を削除
+description: 欲しいものリストから登録済みの商品を削除します
+title: "[商品削除] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        商品詳細にある「リストから削除」から開くと、商品IDが自動入力されます。
+  - type: input
+    id: product-id
+    attributes:
+      label: 商品ID
+      description: 商品データのIDを入力してください。
+      placeholder: iphone-air
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: メモ
+      description: 削除理由など、必要な場合のみ入力してください。
