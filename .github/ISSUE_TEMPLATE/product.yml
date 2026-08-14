@@ -13,6 +13,17 @@ body:
       placeholder: https://example.com/product
     validations:
       required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: カテゴリー
+      description: 欲しいものリストで表示するタブを選択してください。
+      options:
+        - Apple製品
+        - カメラ
+        - その他
+    validations:
+      required: true
   - type: textarea
     id: note
     attributes:

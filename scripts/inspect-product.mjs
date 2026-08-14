@@ -47,8 +47,11 @@ const meta = (key) => {
 };
 const elementText = (pattern) => cleanText(html.match(pattern)?.[1] || "");
 const issueOverride = (label) => cleanText(issueBody.match(new RegExp(`(?:^|\\n)\\s*${label}\\s*[:：]\\s*(.+)`, "im"))?.[1] || "");
+const issueFormValue = (label) => cleanText(issueBody.match(new RegExp(`###\\s*${escapeRegex(label)}\\s*\\n+([^\\n]+)`, "im"))?.[1] || "");
 const overrideName = issueOverride("商品名");
 const overridePrice = issueOverride("価格").replace(/[^0-9.]/g, "");
+const requestedCategory = issueFormValue("カテゴリー") || issueOverride("カテゴリー");
+const listCategory = requestedCategory === "カメラ" ? "camera" : requestedCategory === "その他" ? "other" : "apple";
 
 const jsonLd = [];
 for (const script of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
@@ -130,6 +133,7 @@ const result = {
   sku: cleanText(product.sku || fallbackSku || ""),
   mpn: cleanText(product.mpn || product.model || ""),
   category: cleanText(product.category || fallbackCategory || ""),
+  listCategory,
   price: String(overridePrice || offer.price || offer.lowPrice || meta("product:price:amount") || fallbackPrice || "").replace(/[^0-9.]/g, "").trim(),
   priceCurrency: String(offer.priceCurrency || meta("product:price:currency") || "JPY").trim(),
   availability: String(rawAvailability || "").split("/").pop(),

@@ -72,6 +72,7 @@ jobs:
                 '',
                 `- **商品名:** ${safe(result.name)}`,
                 `- **価格:** ${safe(price)}`,
+                `- **カテゴリー:** ${safe(result.listCategory === 'camera' ? 'カメラ' : result.listCategory === 'other' ? 'その他' : 'Apple製品')}`,
                 `- **販売元:** ${safe(result.brand || result.sourceHost || '不明')}`,
                 `- **URL:** ${safe(result.url)}`,
                 '',
