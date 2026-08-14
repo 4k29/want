@@ -12,15 +12,16 @@ const state = {
     ? location.hash.slice(1)
     : "apple",
   financeProductIds: new Set(["iphone-air", "ipad-pro-m4-refurb", "apple-watch-series-11"]),
-  financeAmount: 0,
-  financeAmountMode: "full",
-  paymentCount: 24,
-  annualRate: 0,
+  financeTerms: {
+    "iphone-air": { amount: 0, amountMode: "full", count: 24, rate: 0 },
+    "ipad-pro-m4-refurb": { amount: 0, amountMode: "full", count: 24, rate: 0 },
+    "apple-watch-series-11": { amount: 0, amountMode: "full", count: 24, rate: 0 },
+  },
   subscriptions: [
-    { id: "rakuten-unext", name: "Rakuten最強U-NEXT", price: 4378 },
-    { id: "apple-one", name: "Apple One", price: 1350 },
-    { id: "icloud", name: "iCloud+", price: 540 },
-    { id: "chatgpt", name: "ChatGPT", price: 3000 },
+    { id: "rakuten-unext", name: "Rakuten最強U-NEXT", price: 4378, cycle: "monthly" },
+    { id: "apple-one", name: "Apple One", price: 1350, cycle: "monthly" },
+    { id: "icloud", name: "iCloud+", price: 540, cycle: "monthly" },
+    { id: "chatgpt", name: "ChatGPT", price: 3000, cycle: "monthly" },
   ],
 };
 
@@ -196,14 +197,22 @@ function loadPaymentSettings() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!saved) return;
     if (Array.isArray(saved.financeProductIds)) state.financeProductIds = new Set(saved.financeProductIds);
-    if (Number.isFinite(saved.financeAmount)) state.financeAmount = saved.financeAmount;
-    if (["full", "custom"].includes(saved.financeAmountMode)) state.financeAmountMode = saved.financeAmountMode;
-    if (Number.isFinite(saved.paymentCount)) state.paymentCount = saved.paymentCount;
-    if (Number.isFinite(saved.annualRate)) state.annualRate = saved.annualRate;
+    if (saved.financeTerms && typeof saved.financeTerms === "object") {
+      state.financeTerms = saved.financeTerms;
+    } else if (Number.isFinite(saved.paymentCount)) {
+      [...state.financeProductIds].forEach((id) => {
+        state.financeTerms[id] = {
+          amount: Number(saved.financeAmount) || 0,
+          amountMode: saved.financeAmountMode === "custom" ? "custom" : "full",
+          count: saved.paymentCount,
+          rate: Number(saved.annualRate) || 0,
+        };
+      });
+    }
     if (Array.isArray(saved.subscriptions)) {
       state.subscriptions = saved.subscriptions.filter((item) =>
         item && typeof item.id === "string" && typeof item.name === "string" && Number.isFinite(item.price),
-      );
+      ).map((item) => ({ ...item, cycle: item.cycle === "yearly" ? "yearly" : "monthly" }));
     }
   } catch (error) {
     console.warn("支払い設定を読み込めませんでした。", error);
@@ -214,10 +223,7 @@ function savePaymentSettings() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       financeProductIds: [...state.financeProductIds],
-      financeAmount: state.financeAmount,
-      financeAmountMode: state.financeAmountMode,
-      paymentCount: state.paymentCount,
-      annualRate: state.annualRate,
+      financeTerms: state.financeTerms,
       subscriptions: state.subscriptions,
     }));
   } catch (error) {
@@ -233,6 +239,21 @@ function financePurchaseTotal() {
   return financedProducts().reduce((sum, product) => sum + currentVariant(product).price, 0);
 }
 
+function financeTermFor(product) {
+  const existing = state.financeTerms[product.id] || {};
+  const term = {
+    amount: Number(existing.amount) || 0,
+    amountMode: existing.amountMode === "custom" ? "custom" : "full",
+    count: Math.min(Math.max(Math.round(Number(existing.count) || 24), 1), 120),
+    rate: Math.min(Math.max(Number(existing.rate) || 0, 0), 100),
+  };
+  const price = currentVariant(product).price;
+  if (term.amountMode === "full") term.amount = price;
+  else term.amount = Math.min(Math.max(term.amount, 0), price);
+  state.financeTerms[product.id] = term;
+  return term;
+}
+
 function monthlyLoanPayment(principal, count, annualRate) {
   if (principal <= 0 || count <= 0) return 0;
   const monthlyRate = annualRate / 100 / 12;
@@ -241,22 +262,41 @@ function monthlyLoanPayment(principal, count, annualRate) {
   return principal * monthlyRate * factor / (factor - 1);
 }
 
+function loanResultFor(product) {
+  const price = currentVariant(product).price;
+  const term = financeTermFor(product);
+  const principal = Math.min(Math.max(term.amount, 0), price);
+  const monthly = monthlyLoanPayment(principal, term.count, term.rate);
+  return {
+    price,
+    principal,
+    monthly,
+    upfront: price - principal,
+    interest: Math.max(monthly * term.count - principal, 0),
+  };
+}
+
 function updatePaymentResults() {
-  const purchaseTotal = financePurchaseTotal();
-  const principal = Math.min(Math.max(Number(state.financeAmount) || 0, 0), purchaseTotal);
-  const count = Math.min(Math.max(Math.round(Number(state.paymentCount) || 1), 1), 120);
-  const annualRate = Math.min(Math.max(Number(state.annualRate) || 0, 0), 100);
-  const monthlyLoan = monthlyLoanPayment(principal, count, annualRate);
-  const interest = Math.max(monthlyLoan * count - principal, 0);
-  const subscriptionTotal = state.subscriptions.reduce((sum, item) => sum + Math.max(Number(item.price) || 0, 0), 0);
+  let monthlyInstallments = 0;
+  financedProducts().forEach((product) => {
+    const result = loanResultFor(product);
+    const monthlyRounded = Math.ceil(result.monthly);
+    monthlyInstallments += monthlyRounded;
+    document.querySelector(`[data-term-monthly="${product.id}"]`).textContent = yen.format(monthlyRounded);
+    document.querySelector(`[data-term-upfront="${product.id}"]`).textContent = yen.format(result.upfront);
+    document.querySelector(`[data-term-interest="${product.id}"]`).textContent = yen.format(Math.round(result.interest));
+  });
+  const monthlySubscriptionTotal = state.subscriptions
+    .filter((item) => item.cycle !== "yearly")
+    .reduce((sum, item) => sum + Math.max(Number(item.price) || 0, 0), 0);
+  const yearlySubscriptionTotal = state.subscriptions
+    .filter((item) => item.cycle === "yearly")
+    .reduce((sum, item) => sum + Math.max(Number(item.price) || 0, 0), 0);
 
   document.querySelector("#finance-product-count").textContent = `${financedProducts().length}点`;
-  document.querySelector("#finance-purchase-total").textContent = yen.format(purchaseTotal);
-  document.querySelector("#upfront-total").textContent = yen.format(purchaseTotal - principal);
-  document.querySelector("#interest-total").textContent = yen.format(Math.round(interest));
-  document.querySelector("#subscription-total").textContent = yen.format(subscriptionTotal);
-  document.querySelector("#monthly-total").textContent = yen.format(Math.ceil(monthlyLoan) + subscriptionTotal);
-  document.querySelector("#monthly-breakdown").textContent = `分割 ${yen.format(Math.ceil(monthlyLoan))} ＋ 固定費 ${yen.format(subscriptionTotal)}`;
+  document.querySelector("#subscription-total").textContent = `月 ${yen.format(monthlySubscriptionTotal)}・年 ${yen.format(yearlySubscriptionTotal)}`;
+  document.querySelector("#monthly-total").textContent = yen.format(monthlyInstallments + monthlySubscriptionTotal);
+  document.querySelector("#monthly-breakdown").textContent = `分割 ${yen.format(monthlyInstallments)} ＋ 月払い ${yen.format(monthlySubscriptionTotal)}｜年払い ${yen.format(yearlySubscriptionTotal)}`;
 }
 
 function bindPaymentEvents() {
@@ -264,42 +304,60 @@ function bindPaymentEvents() {
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) state.financeProductIds.add(checkbox.dataset.financeProduct);
       else state.financeProductIds.delete(checkbox.dataset.financeProduct);
-      state.financeAmountMode = "full";
-      state.financeAmount = financePurchaseTotal();
+      const product = state.products.find((item) => item.id === checkbox.dataset.financeProduct);
+      if (product) financeTermFor(product);
       savePaymentSettings();
       renderPayments();
     });
   });
 
-  const amountInput = document.querySelector("#finance-amount");
-  const countInput = document.querySelector("#payment-count");
-  const rateInput = document.querySelector("#annual-rate");
-  amountInput.addEventListener("input", () => {
-    state.financeAmountMode = "custom";
-    state.financeAmount = Number(amountInput.value) || 0;
-    savePaymentSettings();
-    updatePaymentResults();
+  document.querySelectorAll("[data-term-amount]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const product = state.products.find((item) => item.id === input.dataset.termAmount);
+      if (!product) return;
+      const term = financeTermFor(product);
+      term.amountMode = "custom";
+      term.amount = Number(input.value) || 0;
+      savePaymentSettings();
+      updatePaymentResults();
+    });
+    input.addEventListener("change", () => {
+      const product = state.products.find((item) => item.id === input.dataset.termAmount);
+      if (!product) return;
+      const term = financeTermFor(product);
+      term.amount = Math.min(Math.max(term.amount, 0), currentVariant(product).price);
+      savePaymentSettings();
+      renderPayments();
+    });
   });
-  amountInput.addEventListener("change", () => {
-    state.financeAmount = Math.min(Math.max(state.financeAmount, 0), financePurchaseTotal());
-    savePaymentSettings();
-    renderPayments();
+  document.querySelectorAll("[data-term-count]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const product = state.products.find((item) => item.id === input.dataset.termCount);
+      if (!product) return;
+      financeTermFor(product).count = Number(input.value) || 1;
+      savePaymentSettings();
+      updatePaymentResults();
+    });
   });
-  countInput.addEventListener("input", () => {
-    state.paymentCount = Number(countInput.value) || 1;
-    savePaymentSettings();
-    updatePaymentResults();
+  document.querySelectorAll("[data-term-rate]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const product = state.products.find((item) => item.id === input.dataset.termRate);
+      if (!product) return;
+      financeTermFor(product).rate = Number(input.value) || 0;
+      savePaymentSettings();
+      updatePaymentResults();
+    });
   });
-  rateInput.addEventListener("input", () => {
-    state.annualRate = Number(rateInput.value) || 0;
-    savePaymentSettings();
-    updatePaymentResults();
-  });
-  document.querySelector("#use-full-amount").addEventListener("click", () => {
-    state.financeAmountMode = "full";
-    state.financeAmount = financePurchaseTotal();
-    savePaymentSettings();
-    renderPayments();
+  document.querySelectorAll("[data-full-product]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const product = state.products.find((item) => item.id === button.dataset.fullProduct);
+      if (!product) return;
+      const term = financeTermFor(product);
+      term.amountMode = "full";
+      term.amount = currentVariant(product).price;
+      savePaymentSettings();
+      renderPayments();
+    });
   });
 
   document.querySelectorAll("[data-subscription-name]").forEach((input) => {
@@ -317,6 +375,14 @@ function bindPaymentEvents() {
       updatePaymentResults();
     });
   });
+  document.querySelectorAll("[data-subscription-cycle]").forEach((select) => {
+    select.addEventListener("change", () => {
+      const subscription = state.subscriptions.find((item) => item.id === select.dataset.subscriptionCycle);
+      if (subscription) subscription.cycle = select.value === "yearly" ? "yearly" : "monthly";
+      savePaymentSettings();
+      renderPayments();
+    });
+  });
   document.querySelectorAll("[data-remove-subscription]").forEach((button) => {
     button.addEventListener("click", () => {
       state.subscriptions = state.subscriptions.filter((item) => item.id !== button.dataset.removeSubscription);
@@ -328,19 +394,30 @@ function bindPaymentEvents() {
     event.preventDefault();
     const nameInput = document.querySelector("#new-subscription-name");
     const priceInput = document.querySelector("#new-subscription-price");
+    const cycleInput = document.querySelector("#new-subscription-cycle");
     const name = nameInput.value.trim();
     if (!name) return;
-    state.subscriptions.push({ id: `fixed-${Date.now()}`, name, price: Number(priceInput.value) || 0 });
+    state.subscriptions.push({
+      id: `fixed-${Date.now()}`,
+      name,
+      price: Number(priceInput.value) || 0,
+      cycle: cycleInput.value === "yearly" ? "yearly" : "monthly",
+    });
     savePaymentSettings();
     renderPayments();
   };
 }
 
-function renderPayments() {
-  const purchaseTotal = financePurchaseTotal();
-  if (state.financeAmountMode === "full") state.financeAmount = purchaseTotal;
-  else state.financeAmount = Math.min(Math.max(Number(state.financeAmount) || 0, 0), purchaseTotal);
+function renderSubscriptionRow(item) {
+  return `<div class="subscription-edit-row">
+    <input type="text" value="${escapeHtml(item.name)}" data-subscription-name="${escapeHtml(item.id)}" aria-label="固定費の名前" />
+    <div class="input-with-unit"><input type="number" min="0" step="1" value="${Math.max(Number(item.price) || 0, 0)}" data-subscription-price="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}の金額" /><span>円</span></div>
+    <select data-subscription-cycle="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}の支払い周期"><option value="monthly" ${item.cycle !== "yearly" ? "selected" : ""}>月払い</option><option value="yearly" ${item.cycle === "yearly" ? "selected" : ""}>年払い</option></select>
+    <button type="button" data-remove-subscription="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}を削除">×</button>
+  </div>`;
+}
 
+function renderPayments() {
   document.querySelector("#finance-products").innerHTML = PRODUCT_GROUPS.map((group) => {
     const rows = state.products.filter(group.test).map((product) => {
       const variant = currentVariant(product);
@@ -354,18 +431,39 @@ function renderPayments() {
     return `<section class="finance-group"><h4>${group.title}</h4>${rows}</section>`;
   }).join("");
 
-  document.querySelector("#subscription-lines").innerHTML = state.subscriptions.map((item) => `
-    <div class="subscription-edit-row">
-      <input type="text" value="${escapeHtml(item.name)}" data-subscription-name="${escapeHtml(item.id)}" aria-label="固定費の名前" />
-      <div class="input-with-unit"><input type="number" min="0" step="1" value="${Math.max(Number(item.price) || 0, 0)}" data-subscription-price="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}の月額" /><span>円</span></div>
-      <button type="button" data-remove-subscription="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.name)}を削除">×</button>
-    </div>`).join("");
+  const selected = financedProducts();
+  document.querySelector("#product-terms").innerHTML = selected.length
+    ? selected.map((product) => {
+      const variant = currentVariant(product);
+      const term = financeTermFor(product);
+      return `<article class="product-term-card">
+        <div class="product-term-heading"><div><strong>${escapeHtml(product.name)}</strong><span>${yen.format(variant.price)}</span></div><button type="button" data-full-product="${escapeHtml(product.id)}">全額を分割</button></div>
+        <div class="term-fields product-term-fields">
+          <label><span>分割する金額</span><div class="input-with-unit"><input type="number" min="0" max="${variant.price}" step="1000" inputmode="numeric" value="${Math.round(term.amount)}" data-term-amount="${escapeHtml(product.id)}" /><span>円</span></div></label>
+          <label><span>支払回数</span><div class="input-with-unit"><input type="number" min="1" max="120" step="1" inputmode="numeric" value="${term.count}" data-term-count="${escapeHtml(product.id)}" /><span>回</span></div></label>
+          <label><span>実質年率</span><div class="input-with-unit"><input type="number" min="0" max="100" step="0.1" inputmode="decimal" value="${term.rate}" data-term-rate="${escapeHtml(product.id)}" /><span>%</span></div></label>
+        </div>
+        <div class="product-term-result">
+          <div><span>月々</span><strong data-term-monthly="${escapeHtml(product.id)}">￥0</strong></div>
+          <div><span>先に支払う金額</span><strong data-term-upfront="${escapeHtml(product.id)}">￥0</strong></div>
+          <div><span>利息・手数料</span><strong data-term-interest="${escapeHtml(product.id)}">￥0</strong></div>
+        </div>
+      </article>`;
+    }).join("")
+    : `<p class="empty-terms">左の一覧から分割する商品を選択してください。</p>`;
 
-  const amountInput = document.querySelector("#finance-amount");
-  amountInput.max = String(purchaseTotal);
-  amountInput.value = String(Math.round(state.financeAmount));
-  document.querySelector("#payment-count").value = String(state.paymentCount);
-  document.querySelector("#annual-rate").value = String(state.annualRate);
+  const monthlySubscriptions = state.subscriptions.filter((item) => item.cycle !== "yearly");
+  const yearlySubscriptions = state.subscriptions.filter((item) => item.cycle === "yearly");
+  document.querySelector("#subscription-lines").innerHTML = `
+    <section class="subscription-cycle-group">
+      <div class="subscription-cycle-heading"><h4>月払いの固定費</h4><strong>${yen.format(monthlySubscriptions.reduce((sum, item) => sum + Math.max(Number(item.price) || 0, 0), 0))}/月</strong></div>
+      ${monthlySubscriptions.length ? monthlySubscriptions.map(renderSubscriptionRow).join("") : `<p class="empty-subscriptions">月払いの固定費はありません。</p>`}
+    </section>
+    <section class="subscription-cycle-group yearly-subscriptions">
+      <div class="subscription-cycle-heading"><h4>年払いするサブスク</h4><strong>${yen.format(yearlySubscriptions.reduce((sum, item) => sum + Math.max(Number(item.price) || 0, 0), 0))}/年</strong></div>
+      ${yearlySubscriptions.length ? yearlySubscriptions.map(renderSubscriptionRow).join("") : `<p class="empty-subscriptions">年払いするサブスクを追加すると、ここに表示されます。</p>`}
+    </section>`;
+
   bindPaymentEvents();
   updatePaymentResults();
 }
