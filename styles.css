@@ -26,3 +26,5 @@
 
 .detail-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px}.detail-actions .delete-product-link{color:#d70015}.detail-actions .delete-product-link:hover{text-decoration:underline}
 @media(max-width:650px){.category-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-actions{align-items:flex-start;flex-direction:column;gap:12px}}
+
+.product-card-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.product-delete-button{padding:6px 9px;border-radius:8px;background:#fff0f1;color:#d70015;text-decoration:none;font-size:10px;font-weight:650}.product-delete-button:hover{background:#ffe2e5}.product-delete-button:focus-visible{outline:3px solid #d7001533;outline-offset:2px}
