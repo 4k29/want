@@ -1,0 +1,70 @@
+name: Edit product category
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: want-product-additions
+  cancel-in-progress: false
+
+jobs:
+  edit-product-category:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[カテゴリー変更]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update product category
+        id: update
+        continue-on-error: true
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node scripts/edit-product-category.mjs > category-result.json
+
+      - name: Commit updated wish list
+        if: steps.update.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add products.json
+          git commit -m "Edit product category from issue #${{ github.event.issue.number }}"
+          git push origin HEAD:main
+
+      - name: Post result
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const succeeded = '${{ steps.update.outcome }}' === 'success';
+            let result = {};
+            try { result = JSON.parse(fs.readFileSync('category-result.json', 'utf8')); } catch {}
+            const categoryNames = { apple: 'Apple製品', camera: 'カメラ', other: 'その他' };
+            const safe = (value) => String(value ?? '')
+              .replaceAll('&', '&amp;')
+              .replaceAll('<', '&lt;')
+              .replaceAll('>', '&gt;');
+            const body = succeeded
+              ? `## カテゴリーを変更しました\n\n- **商品名:** ${safe(result.name)}\n- **変更先:** ${safe(categoryNames[result.category])}\n\n\`products.json\`とGitHub Pagesへ反映します。`
+              : '## カテゴリーを変更できませんでした\n\n商品IDまたはカテゴリーを確認してIssueを編集してください。';
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+            if (succeeded) {
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+              });
+            }
