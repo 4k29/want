@@ -8,6 +8,7 @@ const state = {
   catalog: null,
   products: [],
   openDetail: null,
+  activeCategory: location.hash === "#camera" ? "camera" : "apple",
 };
 
 const CAMERA_PRODUCT_IDS = new Set([
@@ -31,6 +32,7 @@ const INSTALLMENT_PLANS = [
 ];
 
 const SUBSCRIPTIONS = [
+  { label: "Rakuten最強U-NEXT", price: 4378 },
   { label: "Apple One", price: 1350 },
   { label: "iCloud+", price: 540 },
   { label: "ChatGPT", price: 3000 },
@@ -171,13 +173,15 @@ function renderProduct(product) {
 }
 
 function renderSummary() {
-  const selected = state.products.filter((product) => product.selected);
+  const group = PRODUCT_GROUPS.find((item) => item.id === state.activeCategory) || PRODUCT_GROUPS[0];
+  const selected = state.products.filter((product) => group.test(product) && product.selected);
   const total = selected.reduce((sum, product) => sum + currentVariant(product).price, 0);
   const lines = selected.length
     ? selected.map((product) => `<div><span>${escapeHtml(product.name)}</span><span>${yen.format(currentVariant(product).price)}</span></div>`).join("")
     : "<p>商品を選択してください。</p>";
 
   document.querySelector("#bag-count").textContent = selected.length;
+  document.querySelector("#summary-label").textContent = `${group.title}・選択中`;
   document.querySelector("#selected-count").textContent = selected.length;
   document.querySelector("#summary-lines").innerHTML = lines;
   document.querySelector("#total-price").textContent = yen.format(total);
@@ -234,20 +238,37 @@ function bindProductEvents() {
   });
 }
 
-function render() {
-  const groups = PRODUCT_GROUPS.map((group) => {
-    const products = state.products.filter(group.test);
-    return `<section class="product-group" aria-labelledby="group-${group.id}">
-      <div class="group-heading"><span>${group.number}</span><h2 id="group-${group.id}">${group.title}</h2><small>${products.length}点</small></div>
-      <div class="group-products">${products.map(renderProduct).join("")}</div>
-    </section>`;
-  }).join("");
+function bindTabEvents() {
+  document.querySelectorAll("[data-category]").forEach((tab) => {
+    const active = tab.dataset.category === state.activeCategory;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+    tab.onclick = () => {
+      state.activeCategory = tab.dataset.category;
+      state.openDetail = null;
+      history.replaceState(null, "", `#${state.activeCategory}`);
+      render();
+    };
+  });
+}
 
-  productList.innerHTML = groups + `
+function render() {
+  const group = PRODUCT_GROUPS.find((item) => item.id === state.activeCategory) || PRODUCT_GROUPS[0];
+  const products = state.products.filter(group.test);
+  const groupMarkup = `<section class="product-group" aria-labelledby="group-${group.id}">
+    <div class="group-heading"><span>${group.number}</span><h2 id="group-${group.id}">${group.title}</h2><small>${products.length}点</small></div>
+    <div class="group-products">${products.map(renderProduct).join("")}</div>
+  </section>`;
+
+  productList.innerHTML = groupMarkup + `
     <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・詳細を取得してこのページに自動追加・更新します。</p></div></a>`;
+  productList.setAttribute("aria-label", `${group.title}の欲しいもの`);
+  document.querySelector("#payment-simulator").hidden = state.activeCategory !== "apple";
   renderSummary();
   renderPayments();
   bindProductEvents();
+  bindTabEvents();
 }
 
 async function start() {
@@ -269,3 +290,12 @@ async function start() {
 }
 
 start();
+
+window.addEventListener("hashchange", () => {
+  const category = location.hash === "#camera" ? "camera" : "apple";
+  if (category !== state.activeCategory) {
+    state.activeCategory = category;
+    state.openDetail = null;
+    render();
+  }
+});

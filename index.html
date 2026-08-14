@@ -27,11 +27,16 @@
         <p class="lead">商品の仕様と価格。選択した商品の合計金額を表示します。</p>
       </section>
 
+      <nav class="category-tabs" aria-label="商品カテゴリ" role="tablist">
+        <button type="button" role="tab" data-category="apple" aria-controls="product-list">Apple製品</button>
+        <button type="button" role="tab" data-category="camera" aria-controls="product-list">カメラ</button>
+      </nav>
+
       <div class="content-grid">
         <section class="product-list" id="product-list" aria-label="欲しいもの"></section>
 
         <aside class="summary-card" aria-label="選択した商品の合計">
-          <p class="summary-label">選択中</p>
+          <p class="summary-label" id="summary-label">Apple製品・選択中</p>
           <div class="summary-count"><strong id="selected-count">0</strong><span>点</span></div>
           <div class="summary-lines" id="summary-lines"></div>
           <div class="total-row"><span>合計</span><strong id="total-price">￥0</strong></div>
@@ -41,7 +46,7 @@
         </aside>
       </div>
 
-      <section class="payment-simulator" aria-labelledby="payment-title">
+      <section class="payment-simulator" id="payment-simulator" aria-labelledby="payment-title">
         <div class="simulator-heading">
           <div>
             <p class="section-kicker">MONTHLY PLAN</p>
@@ -58,7 +63,7 @@
           </div>
 
           <div class="subscription-panel">
-            <div class="panel-heading"><h3>毎月の固定費</h3><span>サブスク</span></div>
+            <div class="panel-heading"><h3>毎月の固定費</h3><span>通信・サブスク</span></div>
             <div id="subscription-lines" class="subscription-lines"></div>
             <div class="subscription-total"><span>固定費 合計</span><strong id="subscription-total">￥0</strong></div>
           </div>
