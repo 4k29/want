@@ -144,6 +144,18 @@ function renderOptions(product) {
   }).join("");
 }
 
+function productDeleteIssueUrl(product) {
+  const title = `[商品削除] ${product.name}`;
+  const body = `商品ID: ${product.id}\n\n商品名: ${product.name}\n\nこの商品を欲しいものリストから削除します。`;
+  return `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+}
+
+function categoryChangeIssueUrl(product, category) {
+  const title = `[カテゴリー変更] ${product.name}`;
+  const body = `商品ID: ${product.id}\n\n商品名: ${product.name}\n\nカテゴリー: ${category}`;
+  return `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+}
+
 function renderDetails(product, variant) {
   if (state.openDetail !== product.id) return "";
   const details = detailsFor(product, variant).map((detail) =>
@@ -536,13 +548,22 @@ function bindProductEvents() {
       render();
     });
     card.querySelector("[data-product-category]").addEventListener("change", (event) => {
-      product.listCategory = event.target.value;
+      const previousCategory = productCategory(product);
+      const nextCategory = event.target.value;
+      const categoryName = PRODUCT_GROUPS.find((group) => group.id === nextCategory)?.title || nextCategory;
+      if (!window.confirm(`「${product.name}」を「${categoryName}」へ移動してもいいですか？`)) {
+        event.target.value = previousCategory;
+        return;
+      }
+      window.open(categoryChangeIssueUrl(product, nextCategory), "_blank", "noopener,noreferrer");
+      product.listCategory = nextCategory;
       saveProductSettings();
       state.openDetail = null;
       render();
     });
     card.querySelector("[data-delete-product]").addEventListener("click", () => {
       if (!window.confirm(`「${product.name}」を削除してもいいですか？`)) return;
+      window.open(productDeleteIssueUrl(product), "_blank", "noopener,noreferrer");
       state.products = state.products.filter((item) => item.id !== product.id);
       state.financeProductIds.delete(product.id);
       delete state.financeTerms[product.id];
