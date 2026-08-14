@@ -1,6 +1,6 @@
 {
   "budget": 700000,
-  "lastChecked": "2026-08-07",
+  "lastChecked": "2026-08-14",
   "products": [
     {
       "id": "iphone-air",
@@ -726,6 +726,44 @@
         }
       ],
       "url": "https://lofree.co.jp/products/flow-2-for-mac"
+    },
+    {
+      "id": "oura-ring-5-brushed-silver-52bd9fb",
+      "name": "Oura Ring 5 - Brushed Silver",
+      "configuration": "OURA Ring",
+      "listCategory": "other",
+      "image": "",
+      "imageAlt": "Oura Ring 5 - Brushed Silver",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 499
+        }
+      ],
+      "details": [
+        {
+          "label": "ブランド",
+          "value": "OURA Ring"
+        },
+        {
+          "label": "在庫",
+          "value": "InStock"
+        },
+        {
+          "label": "概要",
+          "value": "Sleek, comfortable, accurate. Oura Smart Ring fits seamlessly into your life, all night and all day."
+        },
+        {
+          "label": "販売元",
+          "value": "OURA Ring"
+        }
+      ],
+      "url": "https://ouraring.com/ja/store/rings/oura-ring-5/brushed-silver"
     }
   ]
 }
