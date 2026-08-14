@@ -27,11 +27,17 @@
         <p class="lead">商品の仕様と価格。選択した商品の合計金額を表示します。</p>
       </section>
 
-      <div class="content-grid">
+      <nav class="category-tabs" aria-label="表示するページ" role="tablist">
+        <button type="button" role="tab" data-category="apple" aria-controls="product-view">Apple製品</button>
+        <button type="button" role="tab" data-category="camera" aria-controls="product-view">カメラ</button>
+        <button type="button" role="tab" data-category="payment" aria-controls="payment-simulator">分割・固定費</button>
+      </nav>
+
+      <div class="content-grid" id="product-view">
         <section class="product-list" id="product-list" aria-label="欲しいもの"></section>
 
         <aside class="summary-card" aria-label="選択した商品の合計">
-          <p class="summary-label">選択中</p>
+          <p class="summary-label" id="summary-label">Apple製品・選択中</p>
           <div class="summary-count"><strong id="selected-count">0</strong><span>点</span></div>
           <div class="summary-lines" id="summary-lines"></div>
           <div class="total-row"><span>合計</span><strong id="total-price">￥0</strong></div>
@@ -41,32 +47,50 @@
         </aside>
       </div>
 
-      <section class="payment-simulator" aria-labelledby="payment-title">
+      <section class="payment-simulator" id="payment-simulator" aria-labelledby="payment-title">
         <div class="simulator-heading">
           <div>
             <p class="section-kicker">MONTHLY PLAN</p>
-            <h2 id="payment-title">毎月の支払い</h2>
+            <h2 id="payment-title">分割・固定費</h2>
           </div>
-          <p>選んだ構成の価格から、端末代と固定費をまとめて計算します。</p>
+          <p>購入希望品から分割対象を選び、支払条件と毎月の固定費を自由に編集できます。</p>
         </div>
 
         <div class="payment-grid">
           <div class="installment-panel">
-            <div class="panel-heading"><h3>端末の分割</h3><span>手数料 0%</span></div>
-            <div id="installment-lines" class="installment-lines"></div>
-            <p class="payment-note">iPadとApple WatchはApple Storeの対象カード24回払い、iPhoneは楽天カードの24回払いを想定しています。</p>
+            <div class="panel-heading"><h3>分割する商品</h3><span id="finance-product-count">0点</span></div>
+            <div id="finance-products" class="finance-products"></div>
+          </div>
+
+          <div class="terms-panel">
+            <div class="panel-heading"><h3>分割条件</h3><span>自由入力</span></div>
+            <div class="term-fields">
+              <label><span>分割する金額</span><div class="input-with-unit"><input id="finance-amount" type="number" min="0" step="1000" inputmode="numeric" /><span>円</span></div></label>
+              <label><span>支払回数</span><div class="input-with-unit"><input id="payment-count" type="number" min="1" max="120" step="1" inputmode="numeric" /><span>回</span></div></label>
+              <label><span>実質年率</span><div class="input-with-unit"><input id="annual-rate" type="number" min="0" max="100" step="0.1" inputmode="decimal" /><span>%</span></div></label>
+            </div>
+            <button class="full-amount-button" id="use-full-amount" type="button">選択商品の全額を分割</button>
+            <div class="loan-summary">
+              <div><span>選択商品の合計</span><strong id="finance-purchase-total">￥0</strong></div>
+              <div><span>先に支払う金額</span><strong id="upfront-total">￥0</strong></div>
+              <div><span>分割手数料・利息</span><strong id="interest-total">￥0</strong></div>
+            </div>
           </div>
 
           <div class="subscription-panel">
-            <div class="panel-heading"><h3>毎月の固定費</h3><span>サブスク</span></div>
-            <div id="subscription-lines" class="subscription-lines"></div>
-            <div class="subscription-total"><span>固定費 合計</span><strong id="subscription-total">￥0</strong></div>
+            <div class="panel-heading"><h3>毎月の固定費</h3><span id="subscription-total">￥0</span></div>
+            <div id="subscription-lines" class="subscription-editor"></div>
+            <form id="subscription-form" class="subscription-form">
+              <input id="new-subscription-name" type="text" placeholder="名前" aria-label="固定費の名前" required />
+              <div class="input-with-unit"><input id="new-subscription-price" type="number" min="0" step="1" inputmode="numeric" placeholder="金額" aria-label="固定費の月額" required /><span>円</span></div>
+              <button type="submit">追加</button>
+            </form>
           </div>
 
           <div class="monthly-total-card">
-            <p>毎月の支払い目安</p>
+            <p>毎月の支払い合計</p>
             <strong id="monthly-total">￥0</strong>
-            <span id="monthly-breakdown">端末代 ￥0 ＋ 固定費 ￥0</span>
+            <span id="monthly-breakdown">分割 ￥0 ＋ 固定費 ￥0</span>
           </div>
         </div>
       </section>
