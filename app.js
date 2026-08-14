@@ -41,6 +41,7 @@ const PRODUCT_GROUPS = [
 ];
 
 const STORAGE_KEY = "want-payment-settings-v1";
+const PRODUCT_STORAGE_KEY = "want-product-settings-v1";
 
 function productCategory(product) {
   if (["apple", "camera", "other"].includes(product.listCategory)) return product.listCategory;
@@ -143,12 +144,6 @@ function renderOptions(product) {
   }).join("");
 }
 
-function deleteProductUrl(product) {
-  const title = `[商品削除] ${product.name}`;
-  const body = `商品ID: ${product.id}\n\n商品名: ${product.name}\n\nこの商品を欲しいものリストから削除します。`;
-  return `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
-}
-
 function renderDetails(product, variant) {
   if (state.openDetail !== product.id) return "";
   const details = detailsFor(product, variant).map((detail) =>
@@ -180,7 +175,13 @@ function renderProduct(product) {
         <div class="product-info">
           <div class="product-heading"><div><h2>${escapeHtml(product.name)}</h2><p class="configuration">${escapeHtml(configurationFor(product, variant))}</p></div><p class="product-price">${yen.format(variant.price)}</p></div>
           ${renderOptions(product)}
-          <div class="product-card-actions"><button class="detail-button" type="button" aria-expanded="${isOpen}">詳細を見る <span class="chevron ${isOpen ? "is-open" : ""}">⌄</span></button><a class="product-delete-button" href="${escapeHtml(deleteProductUrl(product))}" target="_blank" rel="noreferrer">削除</a></div>
+          <div class="product-card-actions">
+            <button class="detail-button" type="button" aria-expanded="${isOpen}">詳細を見る <span class="chevron ${isOpen ? "is-open" : ""}">⌄</span></button>
+            <div class="product-edit-actions">
+              <label><span>カテゴリー</span><select class="product-category-select" data-product-category="${escapeHtml(product.id)}" aria-label="${escapeHtml(product.name)}のカテゴリー"><option value="apple" ${productCategory(product) === "apple" ? "selected" : ""}>Apple製品</option><option value="camera" ${productCategory(product) === "camera" ? "selected" : ""}>カメラ</option><option value="other" ${productCategory(product) === "other" ? "selected" : ""}>その他</option></select></label>
+              <button class="product-delete-button" type="button" data-delete-product="${escapeHtml(product.id)}">削除</button>
+            </div>
+          </div>
         </div>
       </div>
       ${renderDetails(product, variant)}
@@ -240,6 +241,42 @@ function savePaymentSettings() {
     }));
   } catch (error) {
     console.warn("支払い設定を保存できませんでした。", error);
+  }
+}
+
+function loadProductSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY));
+    if (!saved) return;
+    const deletedIds = new Set(Array.isArray(saved.deletedProductIds) ? saved.deletedProductIds : []);
+    const categoryOverrides = saved.categoryOverrides && typeof saved.categoryOverrides === "object"
+      ? saved.categoryOverrides
+      : {};
+    state.products = state.products
+      .filter((product) => !deletedIds.has(product.id))
+      .map((product) => ({
+        ...product,
+        listCategory: ["apple", "camera", "other"].includes(categoryOverrides[product.id])
+          ? categoryOverrides[product.id]
+          : product.listCategory,
+      }));
+  } catch (error) {
+    console.warn("商品設定を読み込めませんでした。", error);
+  }
+}
+
+function saveProductSettings(deletedProductId = null) {
+  try {
+    const previous = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY)) || {};
+    const deletedProductIds = new Set(Array.isArray(previous.deletedProductIds) ? previous.deletedProductIds : []);
+    if (deletedProductId) deletedProductIds.add(deletedProductId);
+    const categoryOverrides = Object.fromEntries(state.products.map((product) => [product.id, productCategory(product)]));
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify({
+      deletedProductIds: [...deletedProductIds],
+      categoryOverrides,
+    }));
+  } catch (error) {
+    console.warn("商品設定を保存できませんでした。", error);
   }
 }
 
@@ -498,6 +535,22 @@ function bindProductEvents() {
       state.openDetail = state.openDetail === product.id ? null : product.id;
       render();
     });
+    card.querySelector("[data-product-category]").addEventListener("change", (event) => {
+      product.listCategory = event.target.value;
+      saveProductSettings();
+      state.openDetail = null;
+      render();
+    });
+    card.querySelector("[data-delete-product]").addEventListener("click", () => {
+      if (!window.confirm(`「${product.name}」を削除してもいいですか？`)) return;
+      state.products = state.products.filter((item) => item.id !== product.id);
+      state.financeProductIds.delete(product.id);
+      delete state.financeTerms[product.id];
+      if (state.openDetail === product.id) state.openDetail = null;
+      saveProductSettings(product.id);
+      savePaymentSettings();
+      render();
+    });
   });
 }
 
@@ -554,6 +607,7 @@ async function start() {
       const variant = product.variants[product.defaultVariant] || product.variants[0];
       return { ...product, selections: { ...variant.options } };
     });
+    loadProductSettings();
     loadPaymentSettings();
     state.financeProductIds = new Set([...state.financeProductIds].filter((id) =>
       state.products.some((product) => product.id === id),
