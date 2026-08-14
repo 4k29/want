@@ -41,6 +41,36 @@
         </aside>
       </div>
 
+      <section class="payment-simulator" aria-labelledby="payment-title">
+        <div class="simulator-heading">
+          <div>
+            <p class="section-kicker">MONTHLY PLAN</p>
+            <h2 id="payment-title">毎月の支払い</h2>
+          </div>
+          <p>選んだ構成の価格から、端末代と固定費をまとめて計算します。</p>
+        </div>
+
+        <div class="payment-grid">
+          <div class="installment-panel">
+            <div class="panel-heading"><h3>端末の分割</h3><span>手数料 0%</span></div>
+            <div id="installment-lines" class="installment-lines"></div>
+            <p class="payment-note">iPadとApple WatchはApple Storeの対象カード24回払い、iPhoneは楽天カードの24回払いを想定しています。</p>
+          </div>
+
+          <div class="subscription-panel">
+            <div class="panel-heading"><h3>毎月の固定費</h3><span>サブスク</span></div>
+            <div id="subscription-lines" class="subscription-lines"></div>
+            <div class="subscription-total"><span>固定費 合計</span><strong id="subscription-total">￥0</strong></div>
+          </div>
+
+          <div class="monthly-total-card">
+            <p>毎月の支払い目安</p>
+            <strong id="monthly-total">￥0</strong>
+            <span id="monthly-breakdown">端末代 ￥0 ＋ 固定費 ￥0</span>
+          </div>
+        </div>
+      </section>
+
       <footer>
         <span id="last-checked">価格確認日を読み込み中</span>
         <span>価格は変更される場合があります。</span>

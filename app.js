@@ -10,6 +10,32 @@ const state = {
   openDetail: null,
 };
 
+const CAMERA_PRODUCT_IDS = new Set([
+  "zr-d595fe6",
+  "nikkor-z-28-135mm-f-4-pz-5582c31",
+  "nikkor-z-35mm-f-1-4-630b829",
+  "nd-nextorage-cfexpress-type-b-usb-40gbps-8a11cd3",
+  "zr-ee26373",
+  "nd-nextorage-165gb-cfexpress-type-b-nx-b2p-c3bdc6f",
+]);
+
+const PRODUCT_GROUPS = [
+  { id: "apple", number: "01", title: "Apple製品", test: (product) => !CAMERA_PRODUCT_IDS.has(product.id) },
+  { id: "camera", number: "02", title: "カメラ", test: (product) => CAMERA_PRODUCT_IDS.has(product.id) },
+];
+
+const INSTALLMENT_PLANS = [
+  { productId: "ipad-pro-m4-refurb", label: "13インチiPad Pro", payments: 24, provider: "対象カード" },
+  { productId: "apple-watch-series-11", label: "Apple Watch", payments: 24, provider: "対象カード" },
+  { productId: "iphone-air", label: "iPhone Air", payments: 24, provider: "楽天カード" },
+];
+
+const SUBSCRIPTIONS = [
+  { label: "Apple One", price: 1350 },
+  { label: "iCloud+", price: 540 },
+  { label: "ChatGPT", price: 3000 },
+];
+
 const productList = document.querySelector("#product-list");
 productList.append(document.querySelector("#loading-template").content.cloneNode(true));
 
@@ -159,6 +185,38 @@ function renderSummary() {
   document.querySelector("#budget-label").textContent = yen.format(state.catalog.budget);
 }
 
+function installmentAmount(price, payments) {
+  return Math.ceil(price / payments);
+}
+
+function renderPayments() {
+  const installmentRows = INSTALLMENT_PLANS.map((plan) => {
+    const product = state.products.find((item) => item.id === plan.productId);
+    if (!product) return "";
+    const price = currentVariant(product).price;
+    const monthly = installmentAmount(price, plan.payments);
+    return `<div class="payment-line">
+      <div><strong>${escapeHtml(plan.label)}</strong><span>${escapeHtml(plan.provider)}・${plan.payments}回</span></div>
+      <div class="payment-amount"><strong>${yen.format(monthly)}</strong><span>/月</span></div>
+    </div>`;
+  }).join("");
+
+  const monthlyDevices = INSTALLMENT_PLANS.reduce((sum, plan) => {
+    const product = state.products.find((item) => item.id === plan.productId);
+    return product ? sum + installmentAmount(currentVariant(product).price, plan.payments) : sum;
+  }, 0);
+  const subscriptionTotal = SUBSCRIPTIONS.reduce((sum, subscription) => sum + subscription.price, 0);
+  const subscriptionRows = SUBSCRIPTIONS.map((subscription) => `
+    <div class="subscription-line"><span>${escapeHtml(subscription.label)}</span><strong>${yen.format(subscription.price)}</strong></div>
+  `).join("");
+
+  document.querySelector("#installment-lines").innerHTML = installmentRows;
+  document.querySelector("#subscription-lines").innerHTML = subscriptionRows;
+  document.querySelector("#subscription-total").textContent = yen.format(subscriptionTotal);
+  document.querySelector("#monthly-total").textContent = yen.format(monthlyDevices + subscriptionTotal);
+  document.querySelector("#monthly-breakdown").textContent = `端末代 ${yen.format(monthlyDevices)} ＋ 固定費 ${yen.format(subscriptionTotal)}`;
+}
+
 function bindProductEvents() {
   document.querySelectorAll(".product-card").forEach((card) => {
     const product = state.products.find((item) => item.id === card.dataset.product);
@@ -177,9 +235,18 @@ function bindProductEvents() {
 }
 
 function render() {
-  productList.innerHTML = state.products.map(renderProduct).join("") + `
+  const groups = PRODUCT_GROUPS.map((group) => {
+    const products = state.products.filter(group.test);
+    return `<section class="product-group" aria-labelledby="group-${group.id}">
+      <div class="group-heading"><span>${group.number}</span><h2 id="group-${group.id}">${group.title}</h2><small>${products.length}点</small></div>
+      <div class="group-products">${products.map(renderProduct).join("")}</div>
+    </section>`;
+  }).join("");
+
+  productList.innerHTML = groups + `
     <a class="add-hint add-link" href="https://github.com/4k29/want/issues/new?template=product.yml" target="_blank" rel="noreferrer"><span class="plus">＋</span><div><h3>リンクから追加する</h3><p>商品URLを貼ると、商品名・価格・画像・詳細を取得してこのページに自動追加・更新します。</p></div></a>`;
   renderSummary();
+  renderPayments();
   bindProductEvents();
 }
 
