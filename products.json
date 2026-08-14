@@ -1,6 +1,6 @@
 {
   "budget": 700000,
-  "lastChecked": "2026-08-14",
+  "lastChecked": "2026-08-07",
   "products": [
     {
       "id": "iphone-air",
@@ -726,6 +726,102 @@
         }
       ],
       "url": "https://lofree.co.jp/products/flow-2-for-mac"
+    },
+    {
+      "id": "oura-ring-5-brushed-silver",
+      "name": "Oura Ring 5",
+      "configuration": "Brushed Silver・サイズ未定",
+      "listCategory": "other",
+      "image": "https://ourahealth.imgix.net/cooper-pdp/or5-brushed-alt.png",
+      "imageAlt": "Brushed SilverのOura Ring 5",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 81800
+        }
+      ],
+      "details": [
+        {
+          "label": "仕上げ",
+          "value": "Brushed Silver"
+        },
+        {
+          "label": "サイズ",
+          "value": "6〜13（未選択）"
+        },
+        {
+          "label": "素材",
+          "value": "チタン"
+        },
+        {
+          "label": "バッテリー",
+          "value": "6〜9日"
+        },
+        {
+          "label": "防水",
+          "value": "最大100m・IP68"
+        },
+        {
+          "label": "対応",
+          "value": "iOS・Android"
+        }
+      ],
+      "url": "https://ouraring.com/ja/store/rings/oura-ring-5/brushed-silver"
+    },
+    {
+      "id": "prograde-cfexpress-4-type-b-gold-512gb",
+      "name": "ProGrade Digital CFexpress 4.0 Type B GOLD",
+      "configuration": "512GB × 1枚",
+      "listCategory": "camera",
+      "image": "https://m.media-amazon.com/images/I/61ZL66+3WYL._AC_SL1104_.jpg",
+      "imageAlt": "ProGrade Digital CFexpress Type B 512GBメモリーカード",
+      "imageClass": "",
+      "selected": true,
+      "defaultVariant": 0,
+      "optionOrder": [],
+      "optionLabels": {},
+      "variants": [
+        {
+          "options": {},
+          "price": 47667
+        }
+      ],
+      "details": [
+        {
+          "label": "容量",
+          "value": "512GB"
+        },
+        {
+          "label": "数量",
+          "value": "1枚"
+        },
+        {
+          "label": "規格",
+          "value": "CFexpress 4.0 Type B"
+        },
+        {
+          "label": "最大読込",
+          "value": "3400MB/s"
+        },
+        {
+          "label": "最大書込",
+          "value": "3000MB/s"
+        },
+        {
+          "label": "持続書込",
+          "value": "850MB/s"
+        },
+        {
+          "label": "ASIN",
+          "value": "B0CN6GPNRJ"
+        }
+      ],
+      "url": "https://www.amazon.co.jp/dp/B0CN6GPNRJ?th=1"
     }
   ]
 }
