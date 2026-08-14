@@ -143,6 +143,12 @@ function renderOptions(product) {
   }).join("");
 }
 
+function deleteProductUrl(product) {
+  const title = `[商品削除] ${product.name}`;
+  const body = `商品ID: ${product.id}\n\n商品名: ${product.name}\n\nこの商品を欲しいものリストから削除します。`;
+  return `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+}
+
 function renderDetails(product, variant) {
   if (state.openDetail !== product.id) return "";
   const details = detailsFor(product, variant).map((detail) =>
@@ -151,9 +157,8 @@ function renderDetails(product, variant) {
   const hasVariantUrl = Boolean(variant.url);
   const url = variant.url || product.url;
   const linkLabel = hasVariantUrl ? "この構成を公式ページで開く ↗" : "公式ページを開く ↗";
-  const deleteUrl = `https://github.com/4k29/want/issues/new?title=${encodeURIComponent(`[商品削除] ${product.name}`)}&body=${encodeURIComponent(`商品ID: ${product.id}\n\n商品名: ${product.name}\n\nこの商品を欲しいものリストから削除します。`)}`;
 
-  return `<div class="detail-panel"><div class="detail-grid">${details}</div><div class="detail-actions"><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${linkLabel}</a><a class="delete-product-link" href="${escapeHtml(deleteUrl)}" target="_blank" rel="noreferrer">リストから削除 ↗</a></div></div>`;
+  return `<div class="detail-panel"><div class="detail-grid">${details}</div><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${linkLabel}</a></div>`;
 }
 
 function renderProduct(product) {
@@ -175,7 +180,7 @@ function renderProduct(product) {
         <div class="product-info">
           <div class="product-heading"><div><h2>${escapeHtml(product.name)}</h2><p class="configuration">${escapeHtml(configurationFor(product, variant))}</p></div><p class="product-price">${yen.format(variant.price)}</p></div>
           ${renderOptions(product)}
-          <button class="detail-button" type="button" aria-expanded="${isOpen}">詳細を見る <span class="chevron ${isOpen ? "is-open" : ""}">⌄</span></button>
+          <div class="product-card-actions"><button class="detail-button" type="button" aria-expanded="${isOpen}">詳細を見る <span class="chevron ${isOpen ? "is-open" : ""}">⌄</span></button><a class="product-delete-button" href="${escapeHtml(deleteProductUrl(product))}" target="_blank" rel="noreferrer">削除</a></div>
         </div>
       </div>
       ${renderDetails(product, variant)}
