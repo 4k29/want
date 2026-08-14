@@ -63,26 +63,17 @@
           </div>
 
           <div class="terms-panel">
-            <div class="panel-heading"><h3>分割条件</h3><span>自由入力</span></div>
-            <div class="term-fields">
-              <label><span>分割する金額</span><div class="input-with-unit"><input id="finance-amount" type="number" min="0" step="1000" inputmode="numeric" /><span>円</span></div></label>
-              <label><span>支払回数</span><div class="input-with-unit"><input id="payment-count" type="number" min="1" max="120" step="1" inputmode="numeric" /><span>回</span></div></label>
-              <label><span>実質年率</span><div class="input-with-unit"><input id="annual-rate" type="number" min="0" max="100" step="0.1" inputmode="decimal" /><span>%</span></div></label>
-            </div>
-            <button class="full-amount-button" id="use-full-amount" type="button">選択商品の全額を分割</button>
-            <div class="loan-summary">
-              <div><span>選択商品の合計</span><strong id="finance-purchase-total">￥0</strong></div>
-              <div><span>先に支払う金額</span><strong id="upfront-total">￥0</strong></div>
-              <div><span>分割手数料・利息</span><strong id="interest-total">￥0</strong></div>
-            </div>
+            <div class="panel-heading"><h3>製品ごとの分割条件</h3><span>個別設定</span></div>
+            <div id="product-terms" class="product-terms"></div>
           </div>
 
           <div class="subscription-panel">
-            <div class="panel-heading"><h3>毎月の固定費</h3><span id="subscription-total">￥0</span></div>
+            <div class="panel-heading"><h3>固定費・サブスク</h3><span id="subscription-total">月 ￥0・年 ￥0</span></div>
             <div id="subscription-lines" class="subscription-editor"></div>
             <form id="subscription-form" class="subscription-form">
               <input id="new-subscription-name" type="text" placeholder="名前" aria-label="固定費の名前" required />
-              <div class="input-with-unit"><input id="new-subscription-price" type="number" min="0" step="1" inputmode="numeric" placeholder="金額" aria-label="固定費の月額" required /><span>円</span></div>
+              <div class="input-with-unit"><input id="new-subscription-price" type="number" min="0" step="1" inputmode="numeric" placeholder="金額" aria-label="固定費の金額" required /><span>円</span></div>
+              <select id="new-subscription-cycle" aria-label="固定費の支払い周期"><option value="monthly">月払い</option><option value="yearly">年払い</option></select>
               <button type="submit">追加</button>
             </form>
           </div>
