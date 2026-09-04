@@ -1,100 +1,35 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f5f5f7" />
-    <meta name="description" content="気になる商品を比べて、選んだものの合計金額がわかる欲しいものリスト。" />
-    <title>wish. — 欲しいものリスト</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="variant-overrides.js" defer></script>
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a class="brand" href="#top" aria-label="欲しいものリストの先頭へ">wish.</a>
-        <div class="bag-status" aria-live="polite">
-          <span class="bag-icon" aria-hidden="true"></span>
-          <span id="bag-count">0</span>
-        </div>
-      </div>
-    </header>
-
-    <main class="page-shell" id="top">
-      <section class="intro">
-        <h1>欲しいものリスト</h1>
-        <p class="lead">商品の仕様と価格。選択した商品の合計金額を表示します。</p>
-      </section>
-
-      <nav class="category-tabs" aria-label="表示するページ" role="tablist">
-        <button type="button" role="tab" data-category="apple" aria-controls="product-view">Apple製品</button>
-        <button type="button" role="tab" data-category="camera" aria-controls="product-view">カメラ</button>
-        <button type="button" role="tab" data-category="other" aria-controls="product-view">その他</button>
-        <button type="button" role="tab" data-category="payment" aria-controls="payment-simulator">分割・固定費</button>
-      </nav>
-
-      <div class="content-grid" id="product-view">
-        <section class="product-list" id="product-list" aria-label="欲しいもの"></section>
-
-        <aside class="summary-card" aria-label="選択した商品の合計">
-          <p class="summary-label" id="summary-label">Apple製品・選択中</p>
-          <div class="summary-count"><strong id="selected-count">0</strong><span>点</span></div>
-          <div class="summary-lines" id="summary-lines"></div>
-          <div class="total-row"><span>合計</span><strong id="total-price">￥0</strong></div>
-          <p class="tax-note">税込価格。送料・下取り・分割手数料は含みません。</p>
-          <div class="budget-meter" aria-label="選択金額の目安"><span id="budget-progress"></span></div>
-          <div class="summary-footer"><span>予算目安</span><span id="budget-label">￥700,000</span></div>
-        </aside>
-      </div>
-
-      <section class="payment-simulator" id="payment-simulator" aria-labelledby="payment-title">
-        <div class="simulator-heading">
-          <div>
-            <p class="section-kicker">MONTHLY PLAN</p>
-            <h2 id="payment-title">分割・固定費</h2>
-          </div>
-          <p>購入希望品から分割対象を選び、支払条件と毎月の固定費を自由に編集できます。</p>
-        </div>
-
-        <div class="payment-grid">
-          <div class="installment-panel">
-            <div class="panel-heading"><h3>分割する商品</h3><span id="finance-product-count">0点</span></div>
-            <div id="finance-products" class="finance-products"></div>
-          </div>
-
-          <div class="terms-panel">
-            <div class="panel-heading"><h3>製品ごとの分割条件</h3><span>個別設定</span></div>
-            <div id="product-terms" class="product-terms"></div>
-          </div>
-
-          <div class="subscription-panel">
-            <div class="panel-heading"><h3>固定費・サブスク</h3><span id="subscription-total">月 ￥0・年 ￥0</span></div>
-            <div id="subscription-lines" class="subscription-editor"></div>
-            <form id="subscription-form" class="subscription-form">
-              <input id="new-subscription-name" type="text" placeholder="名前" aria-label="固定費の名前" required />
-              <div class="input-with-unit"><input id="new-subscription-price" type="number" min="0" step="1" inputmode="numeric" placeholder="金額" aria-label="固定費の金額" required /><span>円</span></div>
-              <select id="new-subscription-cycle" aria-label="固定費の支払い周期"><option value="monthly">月払い</option><option value="yearly">年払い</option></select>
-              <button type="submit">追加</button>
-            </form>
-          </div>
-
-          <div class="monthly-total-card">
-            <p>毎月の支払い合計</p>
-            <strong id="monthly-total">￥0</strong>
-            <span id="monthly-breakdown">分割 ￥0 ＋ 固定費 ￥0</span>
-          </div>
-        </div>
-      </section>
-
-      <footer>
-        <span id="last-checked">価格確認日を読み込み中</span>
-        <span>価格は変更される場合があります。</span>
-      </footer>
-    </main>
-
-    <template id="loading-template">
-      <div class="loading-card">欲しいものを読み込んでいます…</div>
-    </template>
-  </body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8fa"><meta name="description" content="欲しいものと、毎月の支出をひとつに。"><title>Wishlist</title><link rel="stylesheet" href="./style.css"><script type="module" src="./app.js"></script></head>
+<body>
+<header><a class="brand" href="./" aria-label="Wishlist ホーム"><span class="brand-mark">w.</span> Wishlist</a><div class="header-actions"><span id="save-status">このブラウザに保存</span><button id="backup" class="quiet">バックアップ</button><button id="restore" class="quiet">読み込み</button><input type="file" id="restore-file" accept="application/json,.json" hidden></div></header>
+<main>
+<div class="heading"><div><p class="eyebrow">YOUR PERSONAL LIST</p><h1>欲しいものと、<br class="mobile-only">これからの支出。</h1></div><button class="primary" id="add">＋ アイテムを追加</button></div>
+<section class="metrics" aria-label="支出の概要">
+<article class="metric total"><span>欲しいものの総額</span><strong id="total">¥0</strong><small id="total-detail">0点 · 手数料を含む</small></article>
+<article class="metric"><span>毎月の固定費 <small>月額換算</small></span><strong id="fixed">¥0</strong><small id="fixed-detail">契約中のサブスク ＋ 支払い中の分割</small></article>
+<article class="metric"><span>欲しいものをすべて買うと</span><strong id="planned">¥0<em>/ 月</em></strong><small>固定費 ＋ 購入予定の分割払い</small></article>
+</section>
+<section class="workspace">
+<div class="toolbar"><div class="tabs" role="tablist" aria-label="表示するリスト"><button role="tab" aria-selected="true" data-tab="products">欲しいもの <span id="product-count">0</span></button><button role="tab" aria-selected="false" data-tab="subscriptions">サブスク <span id="subscription-count">0</span></button></div><div class="filters"><label class="sr-only" for="category-filter">カテゴリーで絞り込み</label><select id="category-filter"><option value="all">すべてのカテゴリー</option></select><label class="sr-only" for="sort">並び順</label><select id="sort"><option value="manual">手動の並び順</option><option value="priority">優先順位が高い順</option><option value="price-desc">価格が高い順</option><option value="price-asc">価格が安い順</option><option value="newest">追加が新しい順</option></select></div></div>
+<div class="list-top"><span id="list-summary">0点</span><span>JPY / 税込価格で登録</span></div>
+<div id="items"></div>
+<div class="empty" id="empty"><div class="empty-symbol">＋</div><h2>最初のひとつを、リストに。</h2><p>商品のリンクから追加して、<br>価格や月々の支払いをまとめて確認できます。</p><button id="empty-add" class="primary">アイテムを追加</button></div>
+</section>
+<section class="breakdown"><div><p class="eyebrow">MONTHLY OVERVIEW</p><h2>月々の内訳</h2><p class="muted">購入予定と、今の支払いを分けて把握。</p></div><dl><div><dt>契約中のサブスク <small>年払いは12分の1</small></dt><dd id="sub-total">¥0</dd></div><div><dt>支払い中の分割</dt><dd id="active-total">¥0</dd></div><div><dt>購入予定の分割</dt><dd id="plan-total">¥0</dd></div><div class="one-time"><dt>購入予定の一括払い</dt><dd id="once-total">¥0</dd></div></dl></section>
+<footer>データはこのブラウザに保存されます。端末間の移動にはバックアップを使えます。<br>分割の月額は目安です。端数や請求日は販売店・カード会社の条件をご確認ください。</footer>
+</main>
+<dialog id="editor"><form id="item-form"><div class="dialog-head"><div><p class="eyebrow">EDIT YOUR LIST</p><h2 id="dialog-title">アイテムを追加</h2></div><button type="button" class="icon-button" id="close-editor" aria-label="閉じる">×</button></div>
+<div class="form-body">
+<label>種類<select name="kind"><option value="product">欲しいもの</option><option value="subscription">サブスク・固定費</option></select></label>
+<label>商品・サービスのリンク <span class="optional">任意</span><div class="url-row"><input type="url" name="url" placeholder="https://…"><button type="button" id="fetch-info" class="secondary">情報を取得</button></div></label><p class="field-help">取得時はリンクをMicrolinkに送ります。公開されている商品ページのみ対応。取得した価格・構成は登録前に確認してください。</p><p id="fetch-status" class="fetch-status" role="status"></p>
+<label>名前<input name="name" required maxlength="150" placeholder="例：MacBook Air"></label>
+<div class="form-grid"><label>価格・料金（円）<input type="number" name="price" min="0" max="999999999" step="1" required placeholder="0" inputmode="numeric"></label><label>カテゴリー<input name="category" list="categories" required maxlength="40" placeholder="例：ガジェット"><datalist id="categories"><option value="ガジェット"><option value="カメラ"><option value="暮らし"><option value="ファッション"><option value="その他"></datalist></label></div>
+<div class="form-grid"><label>優先順位<select name="priority"><option value="1">高い · まず欲しい</option><option value="2" selected>普通 · 検討中</option><option value="3">低い · いつか</option></select></label><label>状態<select name="status"><option value="planned">購入予定</option><option value="active">支払い中</option><option value="done">購入済み・支払い完了</option></select></label></div>
+<div id="product-fields"><label>支払い方法<select name="payment"><option value="once">一括払い</option><option value="installment">分割払い</option></select></label><div id="installment-fields" class="inset" hidden><div class="form-grid"><label>支払い回数<input type="number" name="months" min="2" max="600" step="1" value="24" inputmode="numeric"></label><label>手数料の入力方式<select name="feeType"><option value="yen">手数料総額（円）</option><option value="percent">商品価格に対する総率（%）</option></select></label></div><label id="fee-label">手数料<input type="number" name="fee" min="0" max="999999999" step="0.01" value="0" inputmode="decimal"></label><p class="field-help">総率は「価格 × 率」で計算します。実質年率とは異なります。</p><label>初回支払い月<input type="month" name="start"></label><p class="field-help">支払い中の場合は必須。終了月を過ぎると月々の固定費から外れます。</p><div id="installment-preview" class="payment-preview"></div></div></div>
+<div id="subscription-fields" hidden><label>請求の周期<select name="cycle"><option value="monthly">毎月</option><option value="yearly">毎年</option></select></label><p class="field-help">価格・料金には1回の請求額を入力。年払いは12で割って月額換算します。</p></div>
+<label>メモ <span class="optional">任意</span><textarea name="note" rows="2" maxlength="1000" placeholder="カラー、容量、購入する時期など"></textarea></label>
+<p id="form-error" role="alert" class="error"></p></div><div class="dialog-footer"><button type="button" class="danger quiet" id="delete-item" hidden>削除</button><button type="button" class="secondary" id="cancel-editor">キャンセル</button><button class="primary" type="submit">保存する</button></div></form></dialog>
+<dialog id="confirm-dialog"><form method="dialog"><h2 id="confirm-title">削除しますか？</h2><p id="confirm-body"></p><div class="dialog-footer"><button value="cancel" class="secondary">キャンセル</button><button value="ok" class="primary" id="confirm-ok">削除する</button></div></form></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+</body></html>
