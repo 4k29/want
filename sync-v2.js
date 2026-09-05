@@ -49,21 +49,21 @@ export function loadCache(storage=localStorage){
   try{
     const raw=storage.getItem(CACHE_KEY);if(!raw)return null;
     const data=JSON.parse(raw);
-    if(data.version!==2||!Number.isInteger(data.baseRevision)||data.baseRevision<0)return null;
-    return {baseRevision:data.baseRevision,items:validItems(data.items)};
+    if(data.version!==2||!Number.isInteger(data.baseRevision)||data.baseRevision<0||typeof data.dirty!=='boolean')return null;
+    return {baseRevision:data.baseRevision,dirty:data.dirty,items:validItems(data.items)};
   }catch{return null;}
 }
 
-export function saveCache(baseRevision,items,storage=localStorage){
-  storage.setItem(CACHE_KEY,JSON.stringify({version:2,baseRevision,items:validItems(items)}));
+export function saveCache(baseRevision,items,dirty,storage=localStorage){
+  storage.setItem(CACHE_KEY,JSON.stringify({version:2,baseRevision,dirty:!!dirty,items:validItems(items)}));
 }
 
 export function loadWaiting(storage=localStorage){
   try{
     const raw=storage.getItem(WAITING_KEY);if(!raw)return null;
     const data=JSON.parse(raw);
-    if(typeof data.requestId!=='string'||!data.requestId||!Number.isInteger(data.baseRevision)||data.baseRevision<0)return null;
-    return data;
+    if(data.version!==2||typeof data.requestId!=='string'||!data.requestId||!Number.isInteger(data.baseRevision)||data.baseRevision<0||!Array.isArray(data.items))return null;
+    return {version:2,requestId:data.requestId,baseRevision:data.baseRevision,items:validItems(data.items)};
   }catch{return null;}
 }
 
