@@ -1,4 +1,4 @@
-import {GitHubStore,CACHE_KEY} from './sync.js?v=2';
+import {GitHubStore,CACHE_KEY} from './sync.js?v=3';
 import {KEY,yen,currentMonth,monthIndex,cost,activePayment,totals,guessCategory,safeUrl,validate,readBackup,extractProduct} from './model.js?v=2';
 const $=s=>document.querySelector(s),form=$('#item-form'),editor=$('#editor');
 let items=[],tab='products',editing=null,loadError=false,request=null;
@@ -18,7 +18,7 @@ async function refreshData(){
   reading=true;$('#save-status').textContent='GitHubを確認中…';
   try{const result=await github.read();items=result.items;ready=true;lastRead=Date.now();loadError=false;cache();render();$('#save-status').textContent='GitHubの最新データ';showLegacy();}
   catch(error){$('#save-status').textContent='最新データを取得できません';banner(error.message+' 前回取得した内容を表示しています。');}
-  finally{reading=false;}
+  finally{reading=false;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';}
 }
 function openConnection(){ $('#github-error').textContent='';$('#disconnect-github').hidden=!github.token;$('#github-dialog').showModal(); }
 async function commit(next){
@@ -30,7 +30,7 @@ async function commit(next){
   buttons.forEach(b=>{b.dataset.wasDisabled=String(b.disabled);b.disabled=true;});
   try{const result=await github.save(items,next);items=result.items;loadError=false;cache();render();$('#save-status').textContent='GitHubに保存済み';return true;}
   catch(error){$('#save-status').textContent='保存できませんでした';$('#form-error').textContent=error.message;toast(error.message);return false;}
-  finally{busy=false;buttons.forEach(b=>b.disabled=b.dataset.wasDisabled==='true');}
+  finally{busy=false;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';buttons.forEach(b=>b.disabled=b.dataset.wasDisabled==='true');}
 }
 function render(){
   const t=totals(items);$('#total').textContent=yen(t.total);$('#total-detail').textContent=`購入予定 ${t.count}点 · 手数料を含む`;$('#fixed').textContent=yen(t.fixed);$('#planned').innerHTML=`${yen(t.after)}<em>/ 月</em>`;
@@ -97,11 +97,12 @@ $('#close-github').onclick=()=>$('#github-dialog').close();
 $('#github-dialog').addEventListener('close',()=>{$('#github-token').value='';});
 $('#github-form').onsubmit=async e=>{
   e.preventDefault();const button=e.submitter;button.disabled=true;$('#github-error').textContent='';
-  try{await github.connect($('#github-token').value);$('#github-token').value='';$('#github-dialog').close();$('#connect-github').textContent='GitHub接続済み';toast('接続しました。アイテムの保存で共通リストに反映されます。');if(!editor.open)await refreshData();}
+  try{await github.connect($('#github-token').value);$('#github-token').value='';$('#github-dialog').close();$('#connect-github').textContent='GitHub接続済み';toast(github.persisted?'接続キーをこのブラウザに保存しました。':'接続しましたが、キーをブラウザに保存できませんでした。再読み込み後は再接続が必要です。');if(!editor.open)await refreshData();}
   catch(error){$('#github-error').textContent=error.message;}
   finally{button.disabled=false;}
 };
-$('#disconnect-github').onclick=()=>{github.token='';$('#github-dialog').close();$('#connect-github').textContent='GitHub接続';toast('書き込み用の接続を解除しました');};
+$('#disconnect-github').onclick=()=>{try{github.disconnect();$('#github-dialog').close();toast('接続を解除し、保存したキーを削除しました');}catch(error){$('#github-error').textContent=error.message;}$('#connect-github').textContent='GitHub接続';};
+window.addEventListener('storage',e=>{if(e.key==='wishlist-github-token-4k29-want-v1'||e.key===null){github.token=e.newValue||'';github.persisted=!!github.token;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';}});
 $('#migrate-local').onclick=async()=>{
   if(!ready){toast('先に「最新を取得」してください。');return;}
   if(!github.token){openConnection();return;}
@@ -112,4 +113,5 @@ $('#migrate-local').onclick=async()=>{
 };
 editor.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
 window.addEventListener('focus',()=>{if(!editor.open&&!$('#github-dialog').open&&Date.now()-lastRead>120000)refreshData();});
+$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';
 render();refreshData();

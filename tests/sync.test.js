@@ -1,8 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {GitHubStore,encodeData,decodeData,mergeItems,DATABASE_URL} from '../sync.js';
+import {GitHubStore,encodeData,decodeData,mergeItems,DATABASE_URL,TOKEN_KEY} from '../sync.js';
 import {extractProduct,validate} from '../model.js';
 const item={id:'a',kind:'product',name:'カメラ 📷',category:'カメラ',url:'https://example.com/camera',image:'https://example.com/camera.jpg',note:'色：黒',price:100000,fee:0,feeType:'yen',months:24,payment:'installment',priority:2,status:'planned',start:'2026-09',cycle:'monthly',created:1};
+test('verified key survives reload and disconnect removes it',async()=>{
+ const values=new Map(),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
+ const fetcher=async url=>new Response(JSON.stringify(url.includes('/contents/')?{sha:'s',encoding:'base64',content:encodeData([])}:{permissions:{push:true}}));
+ const first=new GitHubStore(fetcher,storage);await first.connect('test-only-key');assert.equal(first.persisted,true);assert.equal(values.get(TOKEN_KEY),'test-only-key');
+ const reloaded=new GitHubStore(fetcher,storage);assert.equal(reloaded.token,'test-only-key');reloaded.disconnect();assert.equal(new GitHubStore(fetcher,storage).token,'');
+});
+test('expired keys are removed and unavailable storage is reported',async()=>{
+ const values=new Map([[TOKEN_KEY,'expired']]),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
+ const expired=new GitHubStore(async()=>new Response('{}',{status:401}),storage);await assert.rejects(expired.read(),/期限/);assert.equal(expired.token,'');assert.equal(values.has(TOKEN_KEY),false);
+ const unavailable={getItem:()=>{throw Error();},setItem:()=>{throw Error();},removeItem:()=>{}};
+ const store=new GitHubStore(async url=>new Response(JSON.stringify(url.includes('/contents/')?{sha:'s',encoding:'base64',content:encodeData([])}:{permissions:{push:true}})),unavailable);await store.connect('test');assert.equal(store.persisted,false);assert.equal(store.token,'test');
+});
 test('Japanese text, emoji and image URL survive GitHub encoding',()=>{assert.deepEqual(decodeData(encodeData([item])),[item]);});
 test('independent device edits merge without losing changes',()=>{
  const b={...item,id:'b',name:'B'};
