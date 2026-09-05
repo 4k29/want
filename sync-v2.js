@@ -21,7 +21,14 @@ export async function readRemote(fetcher=fetch){
       if(!response.ok)throw new Error('HTTP '+response.status);
       const data=await response.json();
       if(data?.version!==2||!Number.isInteger(data.revision)||data.revision<0||typeof data.updatedAt!=='string'||!Array.isArray(data.items))throw new Error('共通データの形式が正しくありません。');
-      return {version:2,revision:data.revision,updatedAt:data.updatedAt,lastRequestId:typeof data.lastRequestId==='string'?data.lastRequestId:'',items:validItems(data.items)};
+      return {
+        version:2,
+        revision:data.revision,
+        updatedAt:data.updatedAt,
+        lastRequestId:typeof data.lastRequestId==='string'?data.lastRequestId:'',
+        recentRequestIds:Array.isArray(data.recentRequestIds)?data.recentRequestIds.filter(id=>typeof id==='string').slice(-100):[],
+        items:validItems(data.items)
+      };
     }catch(error){lastError=error;}
     finally{clearTimeout(timer);}
   }
