@@ -1,5 +1,11 @@
 {
-  "version": 1,
+  "version": 2,
+  "revision": 1,
+  "updatedAt": "2026-09-05T12:26:59.000Z",
+  "lastRequestId": "migration-v2",
+  "recentRequestIds": [
+    "migration-v2"
+  ],
   "items": [
     {
       "id": "9985718c-ba16-4698-84c7-87dc6692d537",
@@ -20,8 +26,5 @@
       "note": "",
       "created": 1788611201595
     }
-  ],
-  "appliedRequests": [
-    "ac32256e-184e-4f8b-a42b-012ca2be62cf"
   ]
 }
