@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "revision": 2,
-  "updatedAt": "2026-09-05T12:56:11.988Z",
-  "lastRequestId": "65d9f86f-a963-465a-b411-70e9b825ad6d",
+  "revision": 3,
+  "updatedAt": "2026-09-05T13:09:57.296Z",
+  "lastRequestId": "68c88f88-dc8f-452a-837c-0a30a291d786",
   "recentRequestIds": [
     "migration-v2",
-    "65d9f86f-a963-465a-b411-70e9b825ad6d"
+    "65d9f86f-a963-465a-b411-70e9b825ad6d",
+    "68c88f88-dc8f-452a-837c-0a30a291d786"
   ],
   "items": [
     {
@@ -26,6 +27,82 @@
       "cycle": "monthly",
       "note": "",
       "created": 1788611201595
+    },
+    {
+      "id": "38d3fe2f-dbe5-43f6-a31b-cf1d0dffe496",
+      "kind": "product",
+      "name": "13インチiPad Pro（M4）Wi-Fi 1TB（Nano-textureガラス搭載）- シルバー [整備済製品]",
+      "url": "https://www.apple.com/jp-edu/shop/product/fwrg3j/a/13%E3%82%A4%E3%83%B3%E3%83%81iPad-ProM4Wi-Fi-1TBNano-texture%E3%82%AC%E3%83%A9%E3%82%B9%E6%90%AD%E8%BC%89-%E3%82%B7%E3%83%AB%E3%83%90%E3%83%BC-%E6%95%B4%E5%82%99%E6%B8%88%E8%A3%BD%E5%93%81?fnode=1cda48a5ea9032d698ca75778a032f296fe6d86fee176e80dd8965b5e53819a322965e90011ec20c66d954065158d70de27607f8dcd755f20da9a6d301447ac7bf1566fb2aa29e3489a783202cd3f3ac",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/refurb-ipad-pro-13inch-8th-gen-wifi-silver-202512?wid=4004&hei=4004&fmt=jpeg&qlt=90&.v=1770008685355",
+      "price": 311800,
+      "category": "ガジェット",
+      "priority": 2,
+      "status": "planned",
+      "payment": "installment",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788613634711
+    },
+    {
+      "id": "31968ed6-25d3-483a-8564-e928b526cbae",
+      "kind": "subscription",
+      "name": "Apple One",
+      "url": "https://www.apple.com/jp/apple-one/",
+      "image": "https://www.apple.com/jp/apple-one/images/meta/og__diu4z5hyr8ia_overview.png?202607170738",
+      "price": 1350,
+      "category": "サブスク",
+      "priority": 2,
+      "status": "active",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788613690749
+    },
+    {
+      "id": "9cadda80-b1c5-48da-a62c-941886dfacd5",
+      "kind": "subscription",
+      "name": "iCloud+",
+      "url": "https://www.icloud.com/",
+      "image": "https://www.icloud.com/icloud_logo/icloud_logo.png",
+      "price": 540,
+      "category": "サービス",
+      "priority": 2,
+      "status": "active",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788613738117
+    },
+    {
+      "id": "f5760f51-a4ee-42ba-a201-0b74a2d82307",
+      "kind": "subscription",
+      "name": "ChatGPT Plus",
+      "url": "https://chatgpt.com/ja-JP/plans/plus/",
+      "image": "https://cdn.openai.com/chatgpt/share-og.png",
+      "price": 3000,
+      "category": "サービス",
+      "priority": 2,
+      "status": "active",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788613782872
     }
   ]
 }
