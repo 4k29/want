@@ -1,70 +1,54 @@
-import {readBackup} from './model.js?v=2';
-
-export const DATABASE_URL='https://api.github.com/repos/4k29/want/contents/data/wishlist.json';
-export const TOKEN_KEY='wishlist-github-token-4k29-want-v1';
+import {readBackup,validate} from './model.js?v=2';
 export const CACHE_KEY='wishlist-github-cache-4k29-want-v1';
-export function encodeData(items){
-  const text=JSON.stringify({version:1,items},null,2)+'\n';
-  if(new TextEncoder().encode(text).length>900000)throw new Error('データが大きすぎます。画像には画像URLを指定してください。');
-  return btoa(Array.from(new TextEncoder().encode(text),b=>String.fromCharCode(b)).join(''));
+export const DRAFT_KEY='wishlist-github-draft-4k29-want-v2';
+export const ISSUE_URL='https://github.com/4k29/want/issues/new';
+const same=(a,b)=>JSON.stringify(a,Object.keys(a||{}).sort())===JSON.stringify(b,Object.keys(b||{}).sort());
+const equalOrder=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+export function buildRequest(base,items,id=crypto.randomUUID()){
+  readBackup(JSON.stringify({version:1,items:base}));readBackup(JSON.stringify({version:1,items}));
+  const b=new Map(base.map(i=>[i.id,i])),n=new Map(items.map(i=>[i.id,i]));
+  return {version:1,id,changes:[...new Set([...b.keys(),...n.keys()])].filter(id=>!same(b.get(id),n.get(id))).map(id=>({id,before:b.get(id)||null,after:n.get(id)||null})),beforeOrder:base.map(i=>i.id),afterOrder:items.map(i=>i.id)};
 }
-export function decodeData(content){return readBackup(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(content.replace(/\s/g,'')),c=>c.charCodeAt(0))));}
-function same(a,b){return JSON.stringify(a,Object.keys(a||{}).sort())===JSON.stringify(b,Object.keys(b||{}).sort());}
-export function mergeItems(base,local,remote){
-  const b=new Map(base.map(i=>[i.id,i])),l=new Map(local.map(i=>[i.id,i])),r=new Map(remote.map(i=>[i.id,i]));
-  for(const id of new Set([...b.keys(),...l.keys()])){
-    if(same(b.get(id),l.get(id)))continue;
-    if(!same(b.get(id),r.get(id))&&!same(l.get(id),r.get(id)))throw new Error(`「${l.get(id)?.name||b.get(id)?.name}」は別の端末でも変更されています。入力をメモに控え、編集を閉じて「最新を取得」してからやり直してください。`);
-    if(l.has(id))r.set(id,l.get(id));else r.delete(id);
+export function hasChanges(base,items){const r=buildRequest(base,items,'check');return !!r.changes.length||!equalOrder(r.beforeOrder,r.afterOrder);}
+export function applyRequest(payload,remote){
+  if(payload?.version!==1||typeof payload.id!=='string'||!/^[a-zA-Z0-9-]{1,80}$/.test(payload.id)||!Array.isArray(payload.changes)||payload.changes.length>10000)throw Error('保存リクエストの形式が正しくありません。');
+  readBackup(JSON.stringify({version:1,items:remote}));
+  for(const order of [payload.beforeOrder,payload.afterOrder])if(!Array.isArray(order)||order.length>10000||order.some(id=>typeof id!=='string'||id.length>200)||new Set(order).size!==order.length)throw Error('並び順の形式が正しくありません。');
+  const before=new Set(payload.beforeOrder),after=new Set(payload.afterOrder),changed=new Set(),r=new Map(remote.map(i=>[i.id,i]));
+  for(const c of payload.changes){
+    if(!c||typeof c.id!=='string'||changed.has(c.id)||c.before===undefined||c.after===undefined||(!c.before&&!c.after))throw Error('変更内容の形式が正しくありません。');
+    changed.add(c.id);
+    for(const value of [c.before,c.after])if(value!==null){validate(value);if(value.id!==c.id)throw Error('項目IDが一致しません。');}
+    if(before.has(c.id)!==!!c.before||after.has(c.id)!==!!c.after)throw Error('変更内容と並び順が一致しません。');
+    if(!same(c.before,r.get(c.id)||null)&&!same(c.after,r.get(c.id)||null))throw Error('同じ項目が別の端末でも変更されています。サイトで最新を取得し、変更を調整してから保存し直してください。');
+    if(c.after)r.set(c.id,c.after);else r.delete(c.id);
   }
-  const baseIds=base.map(i=>i.id),existing=new Set(baseIds);
-  const baseOrder=baseIds.filter(id=>l.has(id)&&r.has(id));
-  const localOrder=local.map(i=>i.id).filter(id=>existing.has(id)&&r.has(id));
-  const remoteOrder=remote.map(i=>i.id).filter(id=>existing.has(id)&&l.has(id));
-  const reordered=JSON.stringify(baseOrder)!==JSON.stringify(localOrder);
-  if(reordered&&JSON.stringify(baseOrder)!==JSON.stringify(remoteOrder)&&JSON.stringify(localOrder)!==JSON.stringify(remoteOrder))throw new Error('別の端末でも並び順が変更されています。「最新を取得」してから並べ替えてください。');
-  const order=reordered?local.map(i=>i.id):remote.map(i=>i.id);
-  return [...new Set([...order,...r.keys()])].filter(id=>r.has(id)).map(id=>r.get(id));
+  for(const id of new Set([...before,...after]))if(before.has(id)!==after.has(id)&&!changed.has(id))throw Error('追加・削除の内容が不足しています。');
+  const common=id=>before.has(id)&&after.has(id)&&r.has(id);
+  const b=payload.beforeOrder.filter(common),l=payload.afterOrder.filter(common),rr=remote.map(i=>i.id).filter(common);
+  const reordered=!equalOrder(b,l);
+  if(reordered&&!equalOrder(b,rr)&&!equalOrder(l,rr))throw Error('別の端末でも並び順が変更されています。最新を取得して調整してください。');
+  const order=reordered?payload.afterOrder:remote.map(i=>i.id);
+  const items=[...new Set([...order,...payload.afterOrder,...r.keys()])].filter(id=>r.has(id)).map(id=>r.get(id));
+  readBackup(JSON.stringify({version:1,items}));return items;
+}
+export function issueLink(payload){
+  const body='Wishlistの共通データを保存します。\n\n```json\n'+JSON.stringify(payload)+'\n```';
+  if(body.length>60000)throw Error('一度の変更量が大きすぎます。変更を分けて保存してください。');
+  const url=new URL(ISSUE_URL);url.searchParams.set('title','[Wishlist] 保存 '+payload.id);url.searchParams.set('body',body);
+  const manual=url.href.length>7000;if(manual)url.searchParams.delete('body');
+  return {url:url.href,body,manual};
 }
 export class GitHubStore {
-  constructor(fetcher=fetch,storage){
-    this.fetcher=fetcher;this.token='';this.storage=storage;this.persisted=false;
-    try{if(storage===undefined)this.storage=globalThis.localStorage;this.token=this.storage?.getItem(TOKEN_KEY)||'';this.persisted=!!this.token;}catch{}
-  }
-  disconnect(){this.token='';this.persisted=false;try{this.storage?.removeItem(TOKEN_KEY);}catch{throw new Error('保存したキーを削除できません。ブラウザのサイトデータを削除してください。');}}
-  remember(){this.persisted=false;try{if(this.storage){this.storage.setItem(TOKEN_KEY,this.token);this.persisted=true;}}catch{}}
-  headers(){return {Accept:'application/vnd.github+json',...(this.token?{Authorization:`Bearer ${this.token}`}:{})};}
-  async request(url,options={}){
-    let response;
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),20000);
-    try{response=await this.fetcher(url,{...options,headers:{...this.headers(),...options.headers},cache:'no-store',signal:controller.signal});}
-    catch{throw new Error(controller.signal.aborted?'GitHubの応答が20秒以内にありませんでした。時間を置いて再試行してください。':'GitHubとの通信が完了しませんでした（通信エラー）。通信環境やコンテンツブロッカーを確認してください。');}
+  constructor(fetcher=fetch){this.fetcher=fetcher;}
+  async read(){
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+    try{
+      const response=await this.fetcher('./data/wishlist.json?t='+Date.now(),{cache:'no-store',signal:controller.signal});
+      if(!response.ok)throw Error('共通データを取得できません（'+response.status+'）。時間を置いて「最新を取得」を押してください。');
+      const raw=await response.text(),data=JSON.parse(raw);
+      return {items:readBackup(raw),appliedRequests:Array.isArray(data.appliedRequests)?data.appliedRequests:[]};
+    }catch(error){if(error instanceof TypeError||error.name==='AbortError')throw Error('共通データを読み込めません。通信を確認して「最新を取得」を押してください。');throw error;}
     finally{clearTimeout(timer);}
-    if(!response.ok){if(response.status===401){this.disconnect();throw new Error('接続キーが無効か、有効期限が切れています。再接続してください。');}if(response.status===409)throw new Error('保存中に別の変更が入りました。もう一度保存してください。');if(response.status===429||response.status===403&&response.headers.get('x-ratelimit-remaining')==='0')throw new Error('GitHubのアクセス回数制限です。時間を置いて再試行してください。');if(response.status===403)throw new Error('GitHubがアクセスを拒否しました（403）。接続キーの対象にwantを含め、ContentsをRead and writeに設定してください。');throw new Error(`GitHubへの保存・取得に失敗しました（${response.status}）。`);}
-    return response.json();
-  }
-  async read(){const d=await this.request(DATABASE_URL+'?ref=main');if(!d.sha||d.encoding!=='base64'||typeof d.content!=='string')throw new Error('共通データの形式を確認できません。');return {items:decodeData(d.content),sha:d.sha};}
-  async connect(token){
-    const candidate=token.trim();
-    if(!candidate||!/^[\x21-\x7e]+$/.test(candidate))throw new Error('接続キーに空白・改行・全角文字が含まれています。GitHubでコピーしたキーだけを貼り付けてください。');
-    const previous=this.token;
-    this.token=candidate;
-    try{const repo=await this.request('https://api.github.com/repos/4k29/want');if(repo.permissions?.push===false)throw new Error('wantへの書き込み権限がある接続キーを入力してください。');await this.read();this.remember();}
-    catch(error){
-      // A temporary network failure must not delete a previously saved key.
-      if(this.token){this.token=previous;}
-      else if(previous&&previous!==candidate){this.token=previous;this.remember();}
-      throw error;
-    }
-  }
-
-  async save(base,next){
-    if(!this.token)throw new Error('「GitHub接続」から書き込み用の接続キーを設定してください。');
-    readBackup(JSON.stringify({version:1,items:next}));
-    const latest=await this.read(),merged=mergeItems(base,next,latest.items);
-    const result=await this.request(DATABASE_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Update wishlist data [skip ci]',content:encodeData(merged),sha:latest.sha,branch:'main'})});
-    if(!result.content?.sha)throw new Error('保存結果を確認できません。「最新を取得」で確認してください。');
-    return {items:merged,sha:result.content.sha};
   }
 }

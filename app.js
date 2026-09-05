@@ -1,4 +1,4 @@
-import {GitHubStore,CACHE_KEY} from './sync.js?v=4';
+import {GitHubStore,CACHE_KEY,DRAFT_KEY,buildRequest,applyRequest,hasChanges,issueLink} from './sync.js?v=5';
 import {KEY,yen,currentMonth,monthIndex,cost,activePayment,totals,guessCategory,safeUrl,validate,readBackup,extractProduct} from './model.js?v=2';
 const $=s=>document.querySelector(s),form=$('#item-form'),editor=$('#editor');
 let items=[],tab='products',editing=null,loadError=false,request=null;
@@ -9,28 +9,57 @@ const field=name=>form.elements.namedItem(name);
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 try{const raw=localStorage.getItem(CACHE_KEY);if(raw)items=readBackup(raw);}catch{}
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4500);}
-function cache(){try{localStorage.setItem(CACHE_KEY,JSON.stringify({version:1,items}));}catch{toast('GitHubには保存済みですが、端末内のキャッシュを保存できません。');}}
+let base=[],pending=null,draftRaw=null;
+try{
+  localStorage.removeItem('wishlist-github-token-4k29-want-v1');
+  draftRaw=localStorage.getItem(DRAFT_KEY);
+  if(draftRaw){const d=JSON.parse(draftRaw);base=readBackup(JSON.stringify({version:1,items:d.base}));items=readBackup(JSON.stringify({version:1,items:d.items}));pending=d.pending||null;ready=true;}
+}catch{loadError=true;}
+function cache(){try{localStorage.setItem(CACHE_KEY,JSON.stringify({version:1,items}));}catch{}}
+function persist(next=items,nextBase=base,nextPending=pending){
+  if(localStorage.getItem(DRAFT_KEY)!==draftRaw)throw Error('別のタブで下書きが変更されました。このページを再読み込みしてください。');
+  const raw=JSON.stringify({version:1,base:nextBase,items:next,pending:nextPending});
+  localStorage.setItem(DRAFT_KEY,raw);draftRaw=raw;
+}
 function banner(message){$('#sync-banner').hidden=!message;$('#sync-message').textContent=message;$('#migrate-local').hidden=!legacy.length;}
-function showLegacy(){if(legacy.length)banner(`この端末に旧版のデータが${legacy.length}点あります。共通リストに追加できます。`);else banner('');}
+function showLegacy(){
+  const dirty=hasChanges(base,items);
+  $('#save-status').textContent=pending?'GitHubで確定・反映待ち':dirty?'下書き · 未同期':'GitHubの最新データ';
+  $('#connect-github').textContent=pending?'保存画面を開く':'GitHubに保存';
+  $('#discard-draft').hidden=!dirty&&!pending;
+  banner(pending?'GitHubの画面で「Submit new issue」を押した後、反映まで少し待って「最新を取得」を押してください。':dirty?'変更はこの端末の下書きです。「GitHubに保存」で他の端末にも反映できます。':legacy.length?`この端末に旧版のデータが${legacy.length}点あります。下書きに追加できます。`:'');
+}
 async function refreshData(){
   if(busy||reading)return;
-  if(editor.open){toast('編集中の内容を保存するか、編集を閉じてから更新してください。');return;}
-  reading=true;$('#save-status').textContent='GitHubを確認中…';
-  try{const result=await github.read();items=result.items;ready=true;lastRead=Date.now();loadError=false;cache();render();$('#save-status').textContent='GitHubの最新データ';showLegacy();}
-  catch(error){$('#save-status').textContent='最新データを取得できません';banner(error.message+' 前回取得した内容を表示しています。');}
-  finally{reading=false;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';}
+  if(editor.open){toast('編集を閉じてから更新してください。');return;}
+  reading=true;$('#save-status').textContent='共通データを確認中…';
+  try{
+    const result=await github.read();
+    if(loadError)throw Error('端末の下書きを読み込めません。上書きを止めています。');
+    let next=result.items,nextPending=pending;
+    if(pending&&result.appliedRequests.includes(pending.id)){nextPending=null;toast('GitHubへの保存とサイトへの反映を確認しました');}
+    else if(ready)next=applyRequest(buildRequest(base,items),result.items);
+    persist(next,result.items,nextPending);items=next;base=result.items;pending=nextPending;
+    ready=true;lastRead=Date.now();cache();render();showLegacy();
+  }catch(error){$('#save-status').textContent='更新を確認できません';banner(error.message+' 端末の下書きは残っています。');$('#discard-draft').hidden=!ready;}
+  finally{reading=false;}
 }
-function openConnection(){ $('#github-error').textContent='';$('#disconnect-github').hidden=!github.token;$('#github-dialog').showModal(); }
+function openConnection(){
+  if(!ready){toast('先に「最新を取得」で共通データを読み込んでください。');return;}
+  if(!hasChanges(base,items)&&!pending){toast('保存する変更はありません。');return;}
+  try{
+    const payload=pending||buildRequest(base,items),link=issueLink(payload);
+    persist(items,base,payload);pending=payload;
+    $('#github-link').href=link.url;$('#manual-save').hidden=!link.manual;$('#save-payload').value=link.body;
+    $('#github-error').textContent='';$('#github-dialog').showModal();showLegacy();
+  }catch(error){toast(error.message);}
+}
 async function commit(next){
-  if(busy||reading){toast('通信が完了するまでお待ちください。');return false;}
+  if(busy||reading){toast('読み込みが完了するまでお待ちください。');return false;}
   if(!ready){toast('先に「最新を取得」で共通データを読み込んでください。');return false;}
-  if(!github.token){openConnection();return false;}
-  busy=true;$('#save-status').textContent='GitHubに保存中…';
-  const buttons=[...document.querySelectorAll('#item-form button, #items button, #add, #empty-add, #restore, #migrate-local, #connect-github')];
-  buttons.forEach(b=>{b.dataset.wasDisabled=String(b.disabled);b.disabled=true;});
-  try{const result=await github.save(items,next);items=result.items;loadError=false;cache();render();$('#save-status').textContent='GitHubに保存済み';return true;}
-  catch(error){$('#save-status').textContent='保存できませんでした';$('#form-error').textContent=error.message;toast(error.message);return false;}
-  finally{busy=false;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';buttons.forEach(b=>b.disabled=b.dataset.wasDisabled==='true');}
+  if(pending){toast('先にGitHubで保存を確定して「最新を取得」を押すか、保存待ちを解除してください。');return false;}
+  try{readBackup(JSON.stringify({version:1,items:next}));persist(next);items=next;cache();render();showLegacy();return true;}
+  catch(error){$('#form-error').textContent=error.message;toast('下書きを保存できません。'+error.message);return false;}
 }
 function render(){
   const t=totals(items);$('#total').textContent=yen(t.total);$('#total-detail').textContent=`購入予定 ${t.count}点 · 手数料を含む`;$('#fixed').textContent=yen(t.fixed);$('#planned').innerHTML=`${yen(t.after)}<em>/ 月</em>`;
@@ -63,9 +92,9 @@ function openEditor(item){if(busy||reading){toast('通信が完了するまで�
 function closeEditor(){if(busy)return;request?.abort();request=null;editor.close();}
 $('#add').onclick=$('#empty-add').onclick=()=>openEditor();$('#close-editor').onclick=$('#cancel-editor').onclick=closeEditor;editor.addEventListener('close',()=>{request?.abort();request=null;});
 field('kind').onchange=()=>updateFields(true);field('payment').onchange=()=>updateFields();field('status').onchange=()=>updateFields();form.addEventListener('input',preview);
-form.onsubmit=async e=>{e.preventDefault();try{const item=validate(formItem());if(await commit(editing?items.map(i=>i.id===editing.id?item:i):[...items,item])){closeEditor();toast('保存しました');}}catch(error){$('#form-error').textContent=error.message;}};
+form.onsubmit=async e=>{e.preventDefault();try{const item=validate(formItem());if(await commit(editing?items.map(i=>i.id===editing.id?item:i):[...items,item])){closeEditor();toast('下書きに反映しました。「GitHubに保存」で同期できます');}}catch(error){$('#form-error').textContent=error.message;}};
 async function confirmAction(title,body,action){$('#confirm-title').textContent=title;$('#confirm-body').textContent=body;$('#confirm-ok').textContent=action;const d=$('#confirm-dialog');d.returnValue='';d.showModal();return new Promise(resolve=>d.addEventListener('close',()=>resolve(d.returnValue==='ok'),{once:true}));}
-$('#delete-item').onclick=async()=>{if(await confirmAction('このアイテムを削除しますか？',editing.name,'削除する')){if(await commit(items.filter(i=>i.id!==editing.id))){closeEditor();toast('削除しました');}}};
+$('#delete-item').onclick=async()=>{if(await confirmAction('このアイテムを削除しますか？',editing.name,'削除する')){if(await commit(items.filter(i=>i.id!==editing.id))){closeEditor();toast('下書きから削除しました。同期には「GitHubに保存」を押してください');}}};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));render();});
 document.querySelectorAll('[role=tab]').forEach(b=>b.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const next=[...document.querySelectorAll('[role=tab]')].find(x=>x!==b);next.click();next.focus();}}));
 $('#sort').onchange=$('#category-filter').onchange=render;
@@ -94,24 +123,21 @@ field('image').addEventListener('change',updateImagePreview);
 $('#refresh-data').onclick=refreshData;
 $('#connect-github').onclick=openConnection;
 $('#close-github').onclick=()=>$('#github-dialog').close();
-$('#github-dialog').addEventListener('close',()=>{$('#github-token').value='';});
-$('#github-form').onsubmit=async e=>{
-  e.preventDefault();const button=e.submitter;button.disabled=true;$('#github-error').textContent='';
-  try{await github.connect($('#github-token').value);$('#github-token').value='';$('#github-dialog').close();$('#connect-github').textContent='GitHub接続済み';toast(github.persisted?'接続キーをこのブラウザに保存しました。':'接続しましたが、キーをブラウザに保存できませんでした。再読み込み後は再接続が必要です。');if(!editor.open)await refreshData();}
-  catch(error){$('#github-error').textContent=error.message;}
-  finally{button.disabled=false;}
+$('#copy-save').onclick=async()=>{try{await navigator.clipboard.writeText($('#save-payload').value);toast('コピーしました。GitHubの本文欄に貼り付けてください。');}catch{$('#save-payload').focus();$('#save-payload').select();toast('本文を選択しました。コピーしてGitHubに貼り付けてください。');}};
+$('#cancel-pending').onclick=()=>{try{persist(items,base,null);pending=null;$('#github-dialog').close();showLegacy();toast('保存待ちを解除しました。提出済みのGitHubリクエストは取り消されません。');}catch(error){toast(error.message);}};
+$('#discard-draft').onclick=async()=>{
+  if(await confirmAction('端末の下書きを破棄しますか？','この端末の未同期の変更を破棄して共通データを読み直します。必要な内容は先にバックアップしてください。提出済みのGitHubリクエストは取り消されません。','下書きを破棄')){
+    try{persist(base,base,null);items=base;pending=null;render();showLegacy();await refreshData();}catch(error){toast(error.message);}
+  }
 };
-$('#disconnect-github').onclick=()=>{try{github.disconnect();$('#github-dialog').close();toast('接続を解除し、保存したキーを削除しました');}catch(error){$('#github-error').textContent=error.message;}$('#connect-github').textContent='GitHub接続';};
-window.addEventListener('storage',e=>{if(e.key==='wishlist-github-token-4k29-want-v1'||e.key===null){github.token=e.newValue||'';github.persisted=!!github.token;$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';}});
 $('#migrate-local').onclick=async()=>{
   if(!ready){toast('先に「最新を取得」してください。');return;}
-  if(!github.token){openConnection();return;}
   const ids=new Set(items.map(i=>i.id));const additional=legacy.filter(i=>!ids.has(i.id));
-  if(await confirmAction('端末のデータを共通リストに追加しますか？',`${additional.length}点を公開リポジトリに保存します。同じIDの項目は現在の共通データを優先します。`,'公開して追加')){
-    if(await commit([...items,...additional])){try{localStorage.setItem(KEY+'-before-github',JSON.stringify({version:1,items:legacy}));localStorage.removeItem(KEY);}catch{}legacy=[];showLegacy();toast('共通リストに追加しました');}
+  if(await confirmAction('端末のデータを下書きに追加しますか？',`${additional.length}点を追加します。「GitHubに保存」を押すまではこの端末だけに保存されます。同じIDの項目は現在の内容を優先します。`,'下書きに追加')){
+    if(await commit([...items,...additional])){try{localStorage.setItem(KEY+'-before-github',JSON.stringify({version:1,items:legacy}));localStorage.removeItem(KEY);}catch{}legacy=[];showLegacy();toast('下書きに追加しました。同期には「GitHubに保存」を押してください');}
   }
 };
 editor.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
 window.addEventListener('focus',()=>{if(!editor.open&&!$('#github-dialog').open&&Date.now()-lastRead>120000)refreshData();});
-$('#connect-github').textContent=github.token?'GitHub接続済み':'GitHub接続';
+
 render();refreshData();
