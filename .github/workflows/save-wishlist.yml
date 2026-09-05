@@ -48,7 +48,9 @@ jobs:
           mkdir -p _site/data
           cp index.html style.css app.js model.js sync.js .nojekyll _site/
           cat autosync.js >> _site/app.js
+          sed -i 's#app.js?v=7#app.js?v=8#' _site/index.html
           cp data/wishlist.json _site/data/
+          node --check _site/app.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
