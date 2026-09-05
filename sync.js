@@ -52,3 +52,8 @@ export class GitHubStore {
     finally{clearTimeout(timer);}
   }
 }
+
+export function refreshState(state,result){
+  const saved=!!state.pending&&result.appliedRequests.includes(state.pending.id);
+  return {base:result.items,items:saved||!state.ready?result.items:applyRequest(buildRequest(state.base,state.items),result.items),pending:saved?null:state.pending,saved};
+}

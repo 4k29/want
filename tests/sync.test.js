@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {GitHubStore,buildRequest,applyRequest,hasChanges,issueLink} from '../sync.js';
+import {GitHubStore,buildRequest,applyRequest,hasChanges,issueLink,refreshState} from '../sync.js';
 import {extractProduct,validate} from '../model.js';
 const item={id:'a',kind:'product',name:'カメラ 📷',category:'カメラ',url:'https://example.com/camera',image:'https://example.com/camera.jpg',note:'色：黒',price:100000,fee:0,feeType:'yen',months:24,payment:'installment',priority:2,status:'planned',start:'2026-09',cycle:'monthly',created:1};
 const change=(base,next,remote=base)=>applyRequest(buildRequest(base,next,'test'),remote);
@@ -47,4 +47,18 @@ test('images are optional for old backups and unsafe schemes are rejected',()=>{
  const {image,...old}=item;assert.equal(validate(old),old);assert.throws(()=>validate({...item,image:'javascript:alert(1)'}));
  assert.equal(extractProduct({image:{url:'https://example.com/image.jpg'}}).image,'https://example.com/image.jpg');
  assert.equal(extractProduct({image:{url:'data:text/html,test'}}).image,'');
+});
+
+test('refresh loads remote additions and edits while preserving unsaved local changes',()=>{
+ const b={...item,id:'b'};
+ const result=refreshState({base:[item],items:[{...item,price:2}],pending:null,ready:true},{items:[item,b],appliedRequests:[]});
+ assert.deepEqual(result.items,[{...item,price:2},b]);assert.deepEqual(result.base,[item,b]);
+});
+test('refresh only clears a pending save after its receipt arrives',()=>{
+ const pending=buildRequest([],[item],'pending');const state={base:[],items:[item],pending,ready:true};
+ const waiting=refreshState(state,{items:[],appliedRequests:[]});assert.deepEqual(waiting.items,[item]);assert.equal(waiting.pending,pending);assert.equal(waiting.saved,false);
+ const saved=refreshState(state,{items:[item],appliedRequests:['pending']});assert.equal(saved.pending,null);assert.equal(saved.saved,true);assert.deepEqual(saved.items,[item]);
+});
+test('refresh shows a remote deletion when there are no local edits',()=>{
+ const result=refreshState({base:[item],items:[item],pending:null,ready:true},{items:[],appliedRequests:[]});assert.deepEqual(result.items,[]);
 });
