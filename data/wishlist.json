@@ -1,1 +1,27 @@
-{"version":1,"items":[]}
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "9985718c-ba16-4698-84c7-87dc6692d537",
+      "kind": "product",
+      "name": "iPhone Air 256GB クラウドホワイト",
+      "url": "https://www.apple.com/jp-edu/shop/buy-iphone/iphone-air/6.5%E3%82%A4%E3%83%B3%E3%83%81%E3%83%87%E3%82%A3%E3%82%B9%E3%83%97%E3%83%AC%E3%82%A4-256gb-%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E3%83%9B%E3%83%AF%E3%82%A4%E3%83%88",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-202509-cloudwhite_FMT_WHH?wid=1280&hei=492&fmt=jpeg&qlt=90&.v=1757636499850",
+      "price": 177800,
+      "category": "ガジェット",
+      "priority": 2,
+      "status": "planned",
+      "payment": "installment",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788611201595
+    }
+  ],
+  "appliedRequests": [
+    "ac32256e-184e-4f8b-a42b-012ca2be62cf"
+  ]
+}
