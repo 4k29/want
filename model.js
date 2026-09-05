@@ -44,6 +44,7 @@ export function validate(item) {
   if(!Number.isInteger(item.price)||item.price<0||item.price>999999999||!Number.isFinite(item.fee)||item.fee<0||item.fee>999999999||!Number.isInteger(item.months)||item.months<2||item.months>600||![1,2,3].includes(item.priority)||!Number.isFinite(item.created))throw new Error('価格・手数料・回数を確認してください。');
   if(item.feeType==='percent'&&item.fee>1000)throw new Error('手数料の総率は1,000%以下で入力してください。');
   safeUrl(item.url);
+  if(item.image!==undefined){if(typeof item.image!=='string'||item.image.length>4000)throw new Error('画像URLを確認してください。');safeUrl(item.image);}
   if(item.start&&!/^\d{4}-(0[1-9]|1[0-2])$/.test(item.start))throw new Error('支払い開始月を確認してください。');
   if(item.kind==='product'&&item.payment==='installment'&&item.status==='active'&&!item.start)throw new Error('支払い中の分割には初回支払い月が必要です。');
   return item;
@@ -65,5 +66,7 @@ export function extractProduct(data) {
   if(price===null&&String(data.currency||'').trim().toUpperCase()==='JPY'&&data.price!==null&&data.price!==undefined&&data.price!=='')price=Number(String(data.price).replace(/[,¥￥\s]/g,''));
   if(!Number.isFinite(price)||price<0||price>999999999)price=null;
   if(price!==null)price=Math.round(price);
-  return {name:String(name).slice(0,150),price};
+  const candidate=[product?.image||[]].flat()[0]||data.image?.url||data.image||'';
+  let image='';try{image=safeUrl(typeof candidate==='string'?candidate:candidate.url||candidate.contentUrl||'');}catch{}
+  return {name:String(name).slice(0,150),price,image};
 }
