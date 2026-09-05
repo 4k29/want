@@ -46,7 +46,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site/data
-          cp index.html style.css app.js model.js sync.js .nojekyll _site/
+          cp index.html style.css app.js autosync.js model.js sync.js .nojekyll _site/
           cp data/wishlist.json _site/data/
       - uses: actions/upload-pages-artifact@v3
         with:
