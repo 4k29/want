@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "revision": 3,
-  "updatedAt": "2026-09-05T13:09:57.296Z",
-  "lastRequestId": "68c88f88-dc8f-452a-837c-0a30a291d786",
+  "revision": 4,
+  "updatedAt": "2026-09-05T13:12:05.259Z",
+  "lastRequestId": "41d3aa3e-7b0e-417b-a129-0146591cf404",
   "recentRequestIds": [
     "migration-v2",
     "65d9f86f-a963-465a-b411-70e9b825ad6d",
-    "68c88f88-dc8f-452a-837c-0a30a291d786"
+    "68c88f88-dc8f-452a-837c-0a30a291d786",
+    "41d3aa3e-7b0e-417b-a129-0146591cf404"
   ],
   "items": [
     {
@@ -73,7 +74,7 @@
       "url": "https://www.icloud.com/",
       "image": "https://www.icloud.com/icloud_logo/icloud_logo.png",
       "price": 540,
-      "category": "サービス",
+      "category": "サブスク",
       "priority": 2,
       "status": "active",
       "payment": "once",
@@ -92,7 +93,7 @@
       "url": "https://chatgpt.com/ja-JP/plans/plus/",
       "image": "https://cdn.openai.com/chatgpt/share-og.png",
       "price": 3000,
-      "category": "サービス",
+      "category": "サブスク",
       "priority": 2,
       "status": "active",
       "payment": "once",
