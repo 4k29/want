@@ -4,6 +4,8 @@ on:
     types: [opened, reopened]
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -27,9 +29,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  test:
+    if: github.event_name != 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check app-v2.js
+          node --check sync-v2.js
+          node --check model.js
+          node --check scripts/save-snapshot.mjs
+      - run: npm test
+
   deploy:
-    needs: save
-    if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: [save, test]
+    if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && needs.test.result == 'success'
     runs-on: ubuntu-latest
     concurrency:
       group: wishlist-pages
@@ -46,14 +64,8 @@ jobs:
         with:
           ref: main
       - uses: actions/configure-pages@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: Prepare site
         run: |
-          node --check app-v2.js
-          node --check sync-v2.js
-          node --check model.js
           mkdir -p _site/data
           cp index.html style.css app-v2.js model.js sync-v2.js .nojekyll _site/
           cp data/wishlist.json _site/data/
