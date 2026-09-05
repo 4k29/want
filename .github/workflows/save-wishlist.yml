@@ -1,15 +1,19 @@
-name: Save wishlist and publish
+name: Wishlist sync v2
 on:
   issues:
     types: [opened, reopened]
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   save:
-    if: github.event_name == 'issues' && github.event.issue.user.login == github.repository_owner && github.actor == github.repository_owner && startsWith(github.event.issue.title, '[Wishlist] 保存 ')
+    if: github.event_name == 'issues' && github.event.issue.user.login == github.repository_owner && github.actor == github.repository_owner && startsWith(github.event.issue.title, '[Wishlist v2] Save ')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -21,16 +25,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node scripts/save-issue.mjs
+      - run: node scripts/save-snapshot.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    if: github.event_name != 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check app-v2.js
+          node --check sync-v2.js
+          node --check model.js
+          node --check scripts/save-snapshot.mjs
+      - run: npm test
+
   deploy:
-    needs: save
-    if: always() && (needs.save.result == 'success' || github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: [save, test]
+    if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && needs.test.result == 'success'
     runs-on: ubuntu-latest
     concurrency:
       group: wishlist-pages
-      cancel-in-progress: false
+      cancel-in-progress: true
     permissions:
       contents: read
       pages: write
@@ -46,11 +67,8 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site/data
-          cp index.html style.css app.js model.js sync.js .nojekyll _site/
-          cat autosync.js >> _site/app.js
-          sed -i 's#app.js?v=7#app.js?v=8#' _site/index.html
+          cp index.html style.css app-v2.js model.js sync-v2.js .nojekyll _site/
           cp data/wishlist.json _site/data/
-          node --check _site/app.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
