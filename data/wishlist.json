@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "revision": 1,
-  "updatedAt": "2026-09-05T12:26:59.000Z",
-  "lastRequestId": "migration-v2",
+  "revision": 2,
+  "updatedAt": "2026-09-05T12:56:11.988Z",
+  "lastRequestId": "65d9f86f-a963-465a-b411-70e9b825ad6d",
   "recentRequestIds": [
-    "migration-v2"
+    "migration-v2",
+    "65d9f86f-a963-465a-b411-70e9b825ad6d"
   ],
   "items": [
     {
@@ -15,7 +16,7 @@
       "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-202509-cloudwhite_FMT_WHH?wid=1280&hei=492&fmt=jpeg&qlt=90&.v=1757636499850",
       "price": 177800,
       "category": "ガジェット",
-      "priority": 2,
+      "priority": 1,
       "status": "planned",
       "payment": "installment",
       "months": 24,
