@@ -40,6 +40,7 @@ jobs:
       - name: Syntax check
         run: |
           node --check app-v2.js
+          node --check category-ui.js
           node --check sync-v2.js
           node --check model.js
           node --check scripts/save-snapshot.mjs
@@ -68,6 +69,7 @@ jobs:
         run: |
           mkdir -p _site/data
           cp index.html style.css app-v2.js model.js sync-v2.js .nojekyll _site/
+          cat category-ui.js >> _site/app-v2.js
           cp data/wishlist.json _site/data/
       - uses: actions/upload-pages-artifact@v3
         with:
