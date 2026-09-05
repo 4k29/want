@@ -1,4 +1,4 @@
-import {GitHubStore,CACHE_KEY,DRAFT_KEY,buildRequest,applyRequest,hasChanges,issueLink,refreshState} from './sync.js?v=6';
+import {GitHubStore,CACHE_KEY,DRAFT_KEY,buildRequest,applyRequest,hasChanges,issueLink,refreshState} from './sync.js?v=7';
 import {KEY,yen,currentMonth,monthIndex,cost,activePayment,totals,guessCategory,safeUrl,validate,readBackup,extractProduct} from './model.js?v=2';
 const $=s=>document.querySelector(s),form=$('#item-form'),editor=$('#editor');
 let items=[],tab='products',editing=null,loadError=false,request=null;
@@ -9,7 +9,7 @@ const field=name=>form.elements.namedItem(name);
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 try{const raw=localStorage.getItem(CACHE_KEY);if(raw)items=readBackup(raw);}catch{}
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4500);}
-let base=[],pending=null,draftRaw=null;
+let base=[...items],pending=null,draftRaw=null;
 try{localStorage.removeItem('wishlist-github-token-4k29-want-v1');}catch{}
 try{
   draftRaw=localStorage.getItem(DRAFT_KEY);
@@ -62,17 +62,15 @@ function openConnection(){
   if(!ready){toast('先に「最新を取得」で共通データを読み込んでください。');return;}
   if(!hasChanges(base,items)&&!pending){toast('保存する変更はありません。');return;}
   try{
-    const payload=pending||buildRequest(base,items),link=issueLink(payload);
+    const payload=pending||{...buildRequest(base,items),localItems:items},link=issueLink(payload);
     persist(items,base,payload);pending=payload;
     $('#github-link').href=link.url;$('#manual-save').hidden=!link.manual;$('#save-payload').value=link.body;
     $('#github-error').textContent='';$('#github-dialog').showModal();showLegacy();
   }catch(error){toast(error.message);}
 }
 async function commit(next){
-  if(busy||reading){toast('読み込みが完了するまでお待ちください。');return false;}
-  if(!ready){toast('先に「最新を取得」で共通データを読み込んでください。');return false;}
-  if(pending){toast('先にGitHubで保存を確定して「最新を取得」を押すか、保存待ちを解除してください。');return false;}
-  try{readBackup(JSON.stringify({version:1,items:next}));persist(next);items=next;cache();render();showLegacy();return true;}
+  if(busy)return false;
+  try{readBackup(JSON.stringify({version:1,items:next}));persist(next);items=next;ready=true;cache();render();showLegacy();return true;}
   catch(error){$('#form-error').textContent=error.message;toast('下書きを保存できません。'+error.message);return false;}
 }
 function render(){
@@ -101,7 +99,7 @@ function updateFields(resetStatus=false){const sub=field('kind').value==='subscr
   field('start').required=installment&&field('status').value==='active';preview();}
 function formItem(){return {id:editing?.id||crypto.randomUUID(),kind:field('kind').value,name:field('name').value.trim(),url:safeUrl(field('url').value.trim()),image:safeUrl(field('image').value.trim()),price:Number(field('price').value),category:field('category').value.trim(),priority:Number(field('priority').value),status:field('status').value,payment:field('payment').value,months:Number(field('months').value)||24,feeType:field('feeType').value,fee:Number(field('fee').value),start:field('start').value,cycle:field('cycle').value,note:field('note').value.trim(),created:editing?.created||Date.now()};}
 function preview(){try{const c=cost(formItem());$('#installment-preview').innerHTML=`月々 <strong>${yen(c.monthly)}</strong><small>支払い総額 ${yen(c.total)} · 手数料 ${yen(c.fee)}<br>毎回 ${yen(Math.floor(c.monthly))} を基準に、端数 ${yen(c.total%Number(field('months').value))} をいずれかの請求に加算。</small>`;}catch{$('#installment-preview').textContent='価格・回数を入力すると月額を確認できます。';}}
-function openEditor(item){if(busy||reading){toast('通信が完了するまでお待ちください。');return;}if(loadError){toast('保存データを読み込めなかったため、上書きを止めています。バックアップを読み込んで復旧してください。');return;}editing=item||null;form.reset();$('#form-error').textContent='';$('#fetch-status').textContent='';$('#delete-item').hidden=!item;$('#dialog-title').textContent=item?'アイテムを編集':'アイテムを追加';
+function openEditor(item){if(busy)return;if(loadError){toast('保存データを読み込めなかったため、上書きを止めています。バックアップを読み込んで復旧してください。');return;}editing=item||null;form.reset();$('#form-error').textContent='';$('#fetch-status').textContent='';$('#delete-item').hidden=!item;$('#dialog-title').textContent=item?'アイテムを編集':'アイテムを追加';
   const defaults=item||{kind:tab==='subscriptions'?'subscription':'product',status:tab==='subscriptions'?'active':'planned',priority:2,payment:'once',months:24,fee:0,feeType:'yen',cycle:'monthly',start:''};Object.entries(defaults).forEach(([k,v])=>{const input=field(k);if(input)input.value=String(v);});updateFields();updateImagePreview();editor.showModal();field('url').focus();}
 function closeEditor(){if(busy)return;request?.abort();request=null;editor.close();}
 $('#add').onclick=$('#empty-add').onclick=()=>openEditor();$('#close-editor').onclick=$('#cancel-editor').onclick=closeEditor;editor.addEventListener('close',()=>{request?.abort();request=null;});

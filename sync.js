@@ -33,7 +33,8 @@ export function applyRequest(payload,remote){
   readBackup(JSON.stringify({version:1,items}));return items;
 }
 export function issueLink(payload){
-  const body='Wishlistの共通データを保存します。\n\n```json\n'+JSON.stringify(payload)+'\n```';
+  const {localItems,...request}=payload;
+  const body='Wishlistの共通データを保存します。\n\n```json\n'+JSON.stringify(request)+'\n```';
   if(body.length>60000)throw Error('一度の変更量が大きすぎます。変更を分けて保存してください。');
   const url=new URL(ISSUE_URL);url.searchParams.set('title','[Wishlist] 保存 '+payload.id);url.searchParams.set('body',body);
   const manual=url.href.length>7000;if(manual)url.searchParams.delete('body');
@@ -55,5 +56,6 @@ export class GitHubStore {
 
 export function refreshState(state,result){
   const saved=!!state.pending&&result.appliedRequests.includes(state.pending.id);
-  return {base:result.items,items:saved||!state.ready?result.items:applyRequest(buildRequest(state.base,state.items),result.items),pending:saved?null:state.pending,saved};
+  const previous=saved?(state.pending.localItems||applyRequest(state.pending,state.base)):state.base;
+  return {base:result.items,items:!state.ready?result.items:applyRequest(buildRequest(previous,state.items),result.items),pending:saved?null:state.pending,saved};
 }

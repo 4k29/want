@@ -1,8 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
 import {GitHubStore,buildRequest,applyRequest,hasChanges,issueLink,refreshState} from '../sync.js';
 import {extractProduct,validate} from '../model.js';
 const item={id:'a',kind:'product',name:'カメラ 📷',category:'カメラ',url:'https://example.com/camera',image:'https://example.com/camera.jpg',note:'色：黒',price:100000,fee:0,feeType:'yen',months:24,payment:'installment',priority:2,status:'planned',start:'2026-09',cycle:'monthly',created:1};
+test('actual add handler accepts drafts before first fetch and during a pending save',async()=>{
+ const source=readFileSync(new URL('../app.js',import.meta.url),'utf8');
+ const commit=source.slice(source.indexOf('async function commit(next)'),source.indexOf('function render()'));
+ for(const pending of [null,{id:'waiting'}]){
+  const context=vm.createContext({busy:false,reading:true,ready:false,pending,items:[],readBackup:()=>{},persist:()=>{},cache:()=>{},render:()=>{},showLegacy:()=>{},toast:()=>{},$:()=>({}),next:[item]});
+  assert.equal(await vm.runInContext(commit+';commit(next)',context),true);
+  assert.deepEqual(context.items,[item]);assert.equal(context.ready,true);
+ }
+});
+test('items added during a pending save survive its acknowledgement',()=>{
+ const added={...item,id:'b'};
+ const pending={...buildRequest([],[item],'pending'),localItems:[item]};
+ const next=refreshState({base:[],items:[item,added],pending,ready:true},{items:[item],appliedRequests:['pending']});
+ assert.deepEqual(next.items,[item,added]);assert.equal(next.pending,null);
+ assert.equal(hasChanges(next.base,next.items),true);
+ assert.equal(issueLink(pending).body.includes('localItems'),false);
+});
 const change=(base,next,remote=base)=>applyRequest(buildRequest(base,next,'test'),remote);
 test('same-origin data read uses no authentication and returns save receipts',async()=>{
  const store=new GitHubStore(async(url,options)=>{assert.ok(url.startsWith('./data/wishlist.json?'));assert.equal(options.headers,undefined);assert.equal(options.method,undefined);return new Response(JSON.stringify({version:1,items:[item],appliedRequests:['saved']}));});
