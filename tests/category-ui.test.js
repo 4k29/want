@@ -4,14 +4,12 @@ import fs from 'node:fs';
 
 const source=fs.readFileSync(new URL('../category-ui.js',import.meta.url),'utf8');
 
-test('category picker uses shared defaults without subscription-only categories',()=>{
-  assert.match(source,/ガジェット/);
-  assert.match(source,/カメラ/);
-  assert.match(source,/暮らし/);
-  assert.match(source,/ファッション/);
-  assert.match(source,/サービス/);
-  assert.doesNotMatch(source,/通信/);
-  assert.doesNotMatch(source,/\['サブスク'/);
+test('category picker has no built-in category names',()=>{
+  for(const name of ['ガジェット','カメラ','暮らし','ファッション','サービス','通信','サブスク']){
+    assert.doesNotMatch(source,new RegExp(name));
+  }
+  assert.match(source,/categoryFilter/);
+  assert.match(source,/availableCategories/);
 });
 
 test('category picker supports custom category entry',()=>{
