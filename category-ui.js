@@ -1,4 +1,3 @@
-const CATEGORY_DEFAULTS=['ガジェット','カメラ','暮らし','ファッション','サービス'];
 const CATEGORY_CUSTOM='__custom__';
 
 const categoryInput=document.querySelector('input[name="category"]');
@@ -34,13 +33,11 @@ if(categoryInput&&editorDialog){
 
   let lastSeen='';
 
-  function availableCategories(current=''){
-    const used=[...(categoryFilter?.options||[])]
+  function availableCategories(){
+    return [...new Set([...(categoryFilter?.options||[])]
       .map(option=>option.value)
-      .filter(value=>value&&value!=='all'&&value!=='その他');
-    const extras=[...new Set([...used,current].filter(Boolean).filter(value=>!CATEGORY_DEFAULTS.includes(value)&&value!=='その他'))]
+      .filter(value=>value&&value!=='all'&&value!=='その他'))]
       .sort((a,b)=>a.localeCompare(b,'ja'));
-    return [...CATEGORY_DEFAULTS,...extras];
   }
 
   function setHidden(value){
@@ -50,7 +47,7 @@ if(categoryInput&&editorDialog){
 
   function rebuild(){
     const current=categoryInput.value.trim();
-    const categories=availableCategories(current);
+    const categories=availableCategories();
     select.innerHTML='<option value="">選択してください</option>'+
       categories.map(value=>`<option value="${value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}">${value.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</option>`).join('')+
       '<option value="'+CATEGORY_CUSTOM+'">その他…</option>';
