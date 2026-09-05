@@ -1,4 +1,4 @@
-import {GitHubStore,CACHE_KEY} from './sync.js?v=3';
+import {GitHubStore,CACHE_KEY} from './sync.js?v=4';
 import {KEY,yen,currentMonth,monthIndex,cost,activePayment,totals,guessCategory,safeUrl,validate,readBackup,extractProduct} from './model.js?v=2';
 const $=s=>document.querySelector(s),form=$('#item-form'),editor=$('#editor');
 let items=[],tab='products',editing=null,loadError=false,request=null;

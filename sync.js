@@ -33,18 +33,32 @@ export class GitHubStore {
   }
   disconnect(){this.token='';this.persisted=false;try{this.storage?.removeItem(TOKEN_KEY);}catch{throw new Error('保存したキーを削除できません。ブラウザのサイトデータを削除してください。');}}
   remember(){this.persisted=false;try{if(this.storage){this.storage.setItem(TOKEN_KEY,this.token);this.persisted=true;}}catch{}}
-  headers(){return {Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2026-03-10',...(this.token?{Authorization:`Bearer ${this.token}`}:{})};}
+  headers(){return {Accept:'application/vnd.github+json',...(this.token?{Authorization:`Bearer ${this.token}`}:{})};}
   async request(url,options={}){
     let response;
-    try{response=await this.fetcher(url,{...options,headers:{...this.headers(),...options.headers},cache:'no-store',signal:AbortSignal.timeout(20000)});}catch{throw new Error('GitHubに接続できません。通信状況を確認してください。');}
-    if(!response.ok){if(response.status===401){this.disconnect();throw new Error('接続キーが無効か、有効期限が切れています。再接続してください。');}if(response.status===409)throw new Error('保存中に別の変更が入りました。もう一度保存してください。');if(response.status===403||response.status===429)throw new Error('GitHubの権限不足、またはアクセス制限です。接続キーの権限を確認するか、時間を置いて再試行してください。');throw new Error(`GitHubへの保存・取得に失敗しました（${response.status}）。`);}
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),20000);
+    try{response=await this.fetcher(url,{...options,headers:{...this.headers(),...options.headers},cache:'no-store',signal:controller.signal});}
+    catch{throw new Error(controller.signal.aborted?'GitHubの応答が20秒以内にありませんでした。時間を置いて再試行してください。':'GitHubとの通信が完了しませんでした（通信エラー）。通信環境やコンテンツブロッカーを確認してください。');}
+    finally{clearTimeout(timer);}
+    if(!response.ok){if(response.status===401){this.disconnect();throw new Error('接続キーが無効か、有効期限が切れています。再接続してください。');}if(response.status===409)throw new Error('保存中に別の変更が入りました。もう一度保存してください。');if(response.status===429||response.status===403&&response.headers.get('x-ratelimit-remaining')==='0')throw new Error('GitHubのアクセス回数制限です。時間を置いて再試行してください。');if(response.status===403)throw new Error('GitHubがアクセスを拒否しました（403）。接続キーの対象にwantを含め、ContentsをRead and writeに設定してください。');throw new Error(`GitHubへの保存・取得に失敗しました（${response.status}）。`);}
     return response.json();
   }
   async read(){const d=await this.request(DATABASE_URL+'?ref=main');if(!d.sha||d.encoding!=='base64'||typeof d.content!=='string')throw new Error('共通データの形式を確認できません。');return {items:decodeData(d.content),sha:d.sha};}
   async connect(token){
-    this.token=token.trim();
-    try{const repo=await this.request('https://api.github.com/repos/4k29/want');if(!repo.permissions?.push)throw new Error('wantへの書き込み権限がある接続キーを入力してください。');await this.read();this.remember();}catch(error){this.disconnect();throw error;}
+    const candidate=token.trim();
+    if(!candidate||!/^[\x21-\x7e]+$/.test(candidate))throw new Error('接続キーに空白・改行・全角文字が含まれています。GitHubでコピーしたキーだけを貼り付けてください。');
+    const previous=this.token;
+    this.token=candidate;
+    try{const repo=await this.request('https://api.github.com/repos/4k29/want');if(repo.permissions?.push===false)throw new Error('wantへの書き込み権限がある接続キーを入力してください。');await this.read();this.remember();}
+    catch(error){
+      // A temporary network failure must not delete a previously saved key.
+      if(this.token){this.token=previous;}
+      else if(previous&&previous!==candidate){this.token=previous;this.remember();}
+      throw error;
+    }
   }
+
   async save(base,next){
     if(!this.token)throw new Error('「GitHub接続」から書き込み用の接続キーを設定してください。');
     readBackup(JSON.stringify({version:1,items:next}));

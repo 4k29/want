@@ -3,6 +3,16 @@ import assert from 'node:assert/strict';
 import {GitHubStore,encodeData,decodeData,mergeItems,DATABASE_URL,TOKEN_KEY} from '../sync.js';
 import {extractProduct,validate} from '../model.js';
 const item={id:'a',kind:'product',name:'カメラ 📷',category:'カメラ',url:'https://example.com/camera',image:'https://example.com/camera.jpg',note:'色：黒',price:100000,fee:0,feeType:'yen',months:24,payment:'installment',priority:2,status:'planned',start:'2026-09',cycle:'monthly',created:1};
+test('connection accepts omitted optional permissions and avoids custom version header',async()=>{
+ const store=new GitHubStore(async(url,options)=>{assert.equal(options.headers['X-GitHub-Api-Version'],undefined);assert.ok(options.signal instanceof AbortSignal);return new Response(JSON.stringify(url.includes('/contents/')?{sha:'s',encoding:'base64',content:encodeData([])}:{}));},null);
+ await store.connect('test-only-key');assert.equal(store.token,'test-only-key');
+});
+test('temporary connection failure retains saved key and invalid pasted input makes no request',async()=>{
+ const values=new Map([[TOKEN_KEY,'saved-test-key']]),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
+ let calls=0;const store=new GitHubStore(async()=>{calls++;throw new TypeError('Failed to fetch');},storage);
+ await assert.rejects(store.connect('replacement-test-key'),/通信エラー/);assert.equal(store.token,'saved-test-key');assert.equal(values.get(TOKEN_KEY),'saved-test-key');
+ await assert.rejects(store.connect('invalid\nkey'),/改行/);assert.equal(calls,1);
+});
 test('verified key survives reload and disconnect removes it',async()=>{
  const values=new Map(),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
  const fetcher=async url=>new Response(JSON.stringify(url.includes('/contents/')?{sha:'s',encoding:'base64',content:encodeData([])}:{permissions:{push:true}}));
