@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "revision": 5,
-  "updatedAt": "2026-09-07T00:39:47.398Z",
-  "lastRequestId": "a45aafad-669c-4e74-a699-d9508e7c1a4b",
+  "revision": 6,
+  "updatedAt": "2026-09-07T00:46:46.915Z",
+  "lastRequestId": "f221b4d9-e81f-4403-b92b-985b7d5beddb",
   "recentRequestIds": [
     "migration-v2",
     "65d9f86f-a963-465a-b411-70e9b825ad6d",
     "68c88f88-dc8f-452a-837c-0a30a291d786",
     "41d3aa3e-7b0e-417b-a129-0146591cf404",
-    "a45aafad-669c-4e74-a699-d9508e7c1a4b"
+    "a45aafad-669c-4e74-a699-d9508e7c1a4b",
+    "f221b4d9-e81f-4403-b92b-985b7d5beddb"
   ],
   "items": [
     {
@@ -219,6 +220,25 @@
       "cycle": "monthly",
       "note": "",
       "created": 1788740506692
+    },
+    {
+      "id": "40adc777-65df-4770-9f9c-ba1043c17073",
+      "kind": "subscription",
+      "name": "Rakuten最強プラン（料金プラン） | 楽天モバイル",
+      "url": "https://network.mobile.rakuten.co.jp/fee/saikyo-plan/#price-u-next",
+      "image": "https://network.mobile.rakuten.co.jp/assets/img/common/ogp.png",
+      "price": 4378,
+      "category": "通信",
+      "priority": 2,
+      "status": "active",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788741971933
     }
   ]
 }
