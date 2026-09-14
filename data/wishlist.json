@@ -1,15 +1,16 @@
 {
   "version": 2,
-  "revision": 6,
-  "updatedAt": "2026-09-07T00:46:46.915Z",
-  "lastRequestId": "f221b4d9-e81f-4403-b92b-985b7d5beddb",
+  "revision": 7,
+  "updatedAt": "2026-09-14T00:30:24.231Z",
+  "lastRequestId": "dbd86ec0-92fc-4521-bac1-42495b3655fd",
   "recentRequestIds": [
     "migration-v2",
     "65d9f86f-a963-465a-b411-70e9b825ad6d",
     "68c88f88-dc8f-452a-837c-0a30a291d786",
     "41d3aa3e-7b0e-417b-a129-0146591cf404",
     "a45aafad-669c-4e74-a699-d9508e7c1a4b",
-    "f221b4d9-e81f-4403-b92b-985b7d5beddb"
+    "f221b4d9-e81f-4403-b92b-985b7d5beddb",
+    "dbd86ec0-92fc-4521-bac1-42495b3655fd"
   ],
   "items": [
     {
@@ -146,6 +147,25 @@
       "created": 1788613634711
     },
     {
+      "id": "b0c5d0cd-60d1-45a6-a5f4-2e9a1a283e35",
+      "kind": "product",
+      "name": "Apple Watch Ultra 4 (GPS + Cellularモ‍デ‍ル) - 49mmナチュラルチタニウムケースとトランスルーセントグレイオーシャンバンド",
+      "url": "https://www.apple.com/jp-edu/shop/buy-watch/apple-watch-ultra/49mm-cellular%E3%83%A2%E3%83%87%E3%83%AB-%E3%83%8A%E3%83%81%E3%83%A5%E3%83%A9%E3%83%AB-%E3%83%81%E3%82%BF%E3%83%8B%E3%82%A6%E3%83%A0-%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B9%E3%83%AB%E3%83%BC%E3%82%BB%E3%83%B3%E3%83%88%E3%82%B0%E3%83%AC%E3%82%A4-%E3%82%AA%E3%83%BC%E3%82%B7%E3%83%A3%E3%83%B3%E3%83%90%E3%83%B3%E3%83%89",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MK7K4_VW_34FR+watch-case-49-titanium-natural-ultra4_VW_34FR+watch-face-49-ultra4_VW_34FR_GEO_JP?wid=2000&hei=2000&fmt=png-alpha&.v=dDhhaVhCdytabStHaDlWdWFsell5cVZGV0ZiSDllNHd6YWJwdVV2Z2xBWm9SMGMvQkpTNDBiSVZSVExOcXdwL0dFNlAvcWROaC9jeFhSWncwT2doWnpkVlV6VGhvNy9VLzFYOUdBNm1QejZlQis1cjd1M3RkZFJTUTkyN256b1FTcWU0Y1dndHNieXpwWHZCbWZnWDlic3VWT0FYT3FNWDhtMVRPWnUyZlg0dTB4c1NWMEc5dVRLTCs2Skp3M3FUZm1veGJ2MXNWLzV2eHpiRi9CMTRadw",
+      "price": 128800,
+      "category": "ガジェット",
+      "priority": 2,
+      "status": "planned",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1789345690150
+    },
+    {
       "id": "75802713-44b2-4f18-9f42-313266986df4",
       "kind": "product",
       "name": "The Frost Air for MacBook",
@@ -203,6 +223,25 @@
       "created": 1788740476503
     },
     {
+      "id": "40adc777-65df-4770-9f9c-ba1043c17073",
+      "kind": "subscription",
+      "name": "Rakuten最強プラン（料金プラン） | 楽天モバイル",
+      "url": "https://network.mobile.rakuten.co.jp/fee/saikyo-plan/#price-u-next",
+      "image": "https://network.mobile.rakuten.co.jp/assets/img/common/ogp.png",
+      "price": 4378,
+      "category": "通信",
+      "priority": 2,
+      "status": "active",
+      "payment": "once",
+      "months": 24,
+      "feeType": "yen",
+      "fee": 0,
+      "start": "",
+      "cycle": "monthly",
+      "note": "",
+      "created": 1788741971933
+    },
+    {
       "id": "c983ff18-edb5-43cd-97c7-fc829bbf0c52",
       "kind": "product",
       "name": "NIKKOR Z 28-135mm f/4 PZ",
@@ -222,15 +261,15 @@
       "created": 1788740506692
     },
     {
-      "id": "40adc777-65df-4770-9f9c-ba1043c17073",
-      "kind": "subscription",
-      "name": "Rakuten最強プラン（料金プラン） | 楽天モバイル",
-      "url": "https://network.mobile.rakuten.co.jp/fee/saikyo-plan/#price-u-next",
-      "image": "https://network.mobile.rakuten.co.jp/assets/img/common/ogp.png",
-      "price": 4378,
-      "category": "通信",
+      "id": "e1b54656-0b48-48fe-acb3-f16609d7f2ed",
+      "kind": "product",
+      "name": "Oura Ring 5 - Brushed Silver",
+      "url": "https://ouraring.com/ja/store/rings/oura-ring-5/brushed-silver",
+      "image": "https://ourahealth.imgix.net/lineItem/or5-brushed-silver.png?s=e479094fb82b3d8a07e32931fc235944",
+      "price": 81800,
+      "category": "ガジェット",
       "priority": 2,
-      "status": "active",
+      "status": "planned",
       "payment": "once",
       "months": 24,
       "feeType": "yen",
@@ -238,7 +277,7 @@
       "start": "",
       "cycle": "monthly",
       "note": "",
-      "created": 1788741971933
+      "created": 1789345782945
     }
   ]
 }
